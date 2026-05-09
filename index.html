@@ -3,116 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>15' Morning Protocol</title>
+    <title>15' Protocol</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#080809">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
     <style>
-        :root {
-            --bg: #080809; --surface: #0f0f11; --card: #141417; --border: #252530;
-            --accent: #e8ff47; --accent3: #3affcb; --text: #ededf0; --muted2: #8888a0;
-        }
+        :root { --bg: #080809; --accent: #e8ff47; --text: #ededf0; --card: #141417; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: 'Barlow Condensed', sans-serif; padding-bottom: 140px; }
-        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
-        .logo-main { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--accent); }
-        .day-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; }
-        .day-pill { background: var(--surface); border: 1px solid var(--border); padding: 8px 20px; border-radius: 100px; color: var(--muted2); font-weight: 600; }
-        .day-pill.active { background: var(--accent); color: var(--bg); }
-        .exc-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
-        .exc-card.active { border-color: var(--accent); }
-        .exc-info { font-family: 'DM Mono', monospace; font-size: 18px; color: var(--accent); margin-top: 10px; display: none; }
-        .exc-card.active .exc-info { display: block; }
-        .timer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0f0f11; border-top: 1px solid var(--border); padding: 20px; display: flex; align-items: center; justify-content: space-between; z-index: 9999; }
-        .t-time { font-family: 'DM Mono', monospace; font-size: 36px; color: var(--accent); }
-        .btn { border: none; border-radius: 12px; font-weight: 700; padding: 12px 18px; font-family: inherit; text-transform: uppercase; }
-        .btn-p { background: var(--accent); color: var(--bg); }
-        .btn-s { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-        .blinking { animation: blink 0.8s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #252530; }
+        .card.active { border-color: var(--accent); }
+        .timer-box { position: fixed; bottom: 0; left:0; right:0; background: #0f0f11; padding: 20px; border-top: 1px solid #252530; display: flex; justify-content: space-between; align-items: center; }
+        .time { font-family: monospace; font-size: 32px; color: var(--accent); }
+        .btn { background: #1a1a1f; color: white; border: 1px solid #252530; padding: 10px 15px; border-radius: 10px; font-weight: bold; }
+        .btn-go { background: var(--accent); color: black; border: none; padding: 10px 25px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header style="margin-bottom:20px;">
-        <h1 class="logo-main">15' PROTOCOL</h1>
-    </header>
+    <h1 style="color:var(--accent); margin-bottom:20px;">15' PROTOCOL</h1>
 
-    <div class="day-nav">
-        <div class="day-pill active">LUN</div>
-        <div class="day-pill">MAR</div>
-        <div class="day-pill">MER</div>
+    <div class="card" onclick="this.classList.toggle('active')">
+        <h2>Push-up Elastico</h2>
+        <p>3 Set x 12-15 Reps</p>
     </div>
 
-    <div id="card1" class="exc-card active" onclick="this.classList.toggle('active')">
-        <h2 style="text-transform:uppercase">Push-up Elastico</h2>
-        <div class="exc-info">3 Set x 12-15 Reps</div>
+    <div class="card" onclick="this.classList.toggle('active')">
+        <h2>Shoulder Press</h2>
+        <p>3 Set x 10 Reps</p>
     </div>
 
-    <div id="card2" class="exc-card" onclick="this.classList.toggle('active')">
-        <h2 style="text-transform:uppercase">Shoulder Press</h2>
-        <div class="exc-info">3 Set x 10 Reps</div>
+    <div class="timer-box">
+        <div id="display" class="time">00:00</div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn" onclick="startTimer(30)">30s</button>
+            <button class="btn" onclick="startTimer(60)">60s</button>
+            <button id="btnGo" class="btn btn-go" onclick="stopTimer()">Reset</button>
+        </div>
     </div>
-</div>
-
-<div class="timer-bar">
-    <div>
-        <div id="tDisplay" class="t-time">00:00</div>
-    </div>
-    <div style="display:flex; gap:10px;">
-        <button class="btn btn-s" onclick="setT(30)">30s</button>
-        <button class="btn btn-s" onclick="setT(60)">60s</button>
-        <button id="tGo" class="btn btn-p" onclick="toggleT()">▶</button>
-    </div>
-</div>
 
 <script>
-    let sec = 0;
-    let inv = null;
-    let run = false;
+    let seconds = 0;
+    let countdown = null;
 
-    function upd() {
-        const m = Math.floor(sec / 60);
-        const s = sec % 60;
-        const txt = m.toString().padStart(2,'0') + ":" + s.toString().padStart(2,'0');
-        document.getElementById('tDisplay').textContent = txt;
-        document.getElementById('tDisplay').classList.remove('blinking');
-    }
-
-    function setT(v) {
-        stopT();
-        sec = v;
-        upd();
-    }
-
-    function toggleT() {
-        if (run) stopT();
-        else startT();
-    }
-
-    function startT() {
-        if (sec <= 0) return;
-        run = true;
-        document.getElementById('tGo').textContent = 'BT'; // Stop symbol
-        inv = setInterval(() => {
-            sec--;
-            upd();
-            if (sec <= 0) {
-                stopT();
-                document.getElementById('tDisplay').classList.add('blinking');
+    function startTimer(val) {
+        clearInterval(countdown);
+        seconds = val;
+        updateDisplay();
+        document.getElementById('btnGo').textContent = "Reset";
+        
+        countdown = setInterval(() => {
+            seconds--;
+            updateDisplay();
+            if (seconds <= 0) {
+                clearInterval(countdown);
                 if (navigator.vibrate) navigator.vibrate(500);
+                alert("Recupero terminato!");
             }
         }, 1000);
     }
 
-    function stopT() {
-        clearInterval(inv);
-        run = false;
-        document.getElementById('tGo').textContent = '▶';
+    function stopTimer() {
+        clearInterval(countdown);
+        seconds = 0;
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        let m = Math.floor(seconds / 60);
+        let s = seconds % 60;
+        document.getElementById('display').textContent = 
+            (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
     }
 </script>
 </body>
