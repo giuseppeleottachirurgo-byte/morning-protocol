@@ -1,0 +1,15 @@
+{
+  "name": "15' Morning Protocol",
+  "short_name": "Morning",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#080809",
+  "theme_color": "#080809",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1213/1213304.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
