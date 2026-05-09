@@ -2,75 +2,84 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>15' Protocol</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#080809">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>15' PROTOCOL</title>
     <style>
-        :root { --bg: #080809; --accent: #e8ff47; --text: #ededf0; --card: #141417; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #252530; }
-        .card.active { border-color: var(--accent); }
-        .timer-box { position: fixed; bottom: 0; left:0; right:0; background: #0f0f11; padding: 20px; border-top: 1px solid #252530; display: flex; justify-content: space-between; align-items: center; }
-        .time { font-family: monospace; font-size: 32px; color: var(--accent); }
-        .btn { background: #1a1a1f; color: white; border: 1px solid #252530; padding: 10px 15px; border-radius: 10px; font-weight: bold; }
-        .btn-go { background: var(--accent); color: black; border: none; padding: 10px 25px; }
+        :root { --bg: #080809; --accent: #e8ff47; --text: #ededf0; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; margin: 0; }
+        .card { background: #141417; padding: 20px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #252530; }
+        .timer-box { position: fixed; bottom: 0; left: 0; right: 0; background: #0f0f11; padding: 30px 20px; border-top: 1px solid #252530; text-align: center; }
+        #display { font-family: monospace; font-size: 50px; color: var(--accent); margin-bottom: 20px; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; }
+        .btn { background: #252530; color: white; border: none; padding: 15px 25px; border-radius: 10px; font-size: 18px; font-weight: bold; min-width: 80px; }
+        #startBtn { background: var(--accent); color: black; }
     </style>
 </head>
 <body>
 
-    <h1 style="color:var(--accent); margin-bottom:20px;">15' PROTOCOL</h1>
+    <h1 style="color:var(--accent); margin-bottom:30px;">15' MORNING</h1>
 
-    <div class="card" onclick="this.classList.toggle('active')">
-        <h2>Push-up Elastico</h2>
+    <div class="card">
+        <h2>PUSH-UP ELASTICO</h2>
         <p>3 Set x 12-15 Reps</p>
     </div>
 
-    <div class="card" onclick="this.classList.toggle('active')">
-        <h2>Shoulder Press</h2>
+    <div class="card">
+        <h2>SHOULDER PRESS</h2>
         <p>3 Set x 10 Reps</p>
     </div>
 
     <div class="timer-box">
-        <div id="display" class="time">00:00</div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn" onclick="startTimer(30)">30s</button>
-            <button class="btn" onclick="startTimer(60)">60s</button>
-            <button id="btnGo" class="btn btn-go" onclick="stopTimer()">Reset</button>
+        <div id="display">00:00</div>
+        <div class="btn-group">
+            <button class="btn t-set" data-time="30">30s</button>
+            <button class="btn t-set" data-time="60">60s</button>
+            <button class="btn" id="startBtn">START</button>
         </div>
     </div>
 
 <script>
-    let seconds = 0;
-    let countdown = null;
+    let timer = null;
+    let timeLeft = 0;
 
-    function startTimer(val) {
-        clearInterval(countdown);
-        seconds = val;
-        updateDisplay();
-        document.getElementById('btnGo').textContent = "Reset";
-        
-        countdown = setInterval(() => {
-            seconds--;
-            updateDisplay();
-            if (seconds <= 0) {
-                clearInterval(countdown);
-                if (navigator.vibrate) navigator.vibrate(500);
-                alert("Recupero terminato!");
+    // Sistema di ascolto diretto (più robusto per Pixel/Chrome)
+    document.addEventListener('click', function (e) {
+        // Se premo i tasti tempo
+        if (e.target.classList.contains('t-set')) {
+            clearInterval(timer);
+            timeLeft = parseInt(e.target.getAttribute('data-time'));
+            update();
+        }
+
+        // Se premo Start/Reset
+        if (e.target.id === 'startBtn') {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+                timeLeft = 0;
+                update();
+                e.target.textContent = "START";
+            } else {
+                if (timeLeft <= 0) return;
+                e.target.textContent = "RESET";
+                timer = setInterval(() => {
+                    timeLeft--;
+                    update();
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        timer = null;
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                        alert("RECUPERO FINITO!");
+                        e.target.textContent = "START";
+                    }
+                }, 1000);
             }
-        }, 1000);
-    }
+        }
+    });
 
-    function stopTimer() {
-        clearInterval(countdown);
-        seconds = 0;
-        updateDisplay();
-    }
-
-    function updateDisplay() {
-        let m = Math.floor(seconds / 60);
-        let s = seconds % 60;
+    function update() {
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
         document.getElementById('display').textContent = 
             (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
     }
