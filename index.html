@@ -9,24 +9,18 @@
     <meta name="theme-color" content="#080809">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --bg: #080809;
             --surface: #0f0f11;
             --card: #141417;
-            --card2: #1a1a1f;
             --border: #252530;
-            --border2: #32323f;
             --accent: #e8ff47;
-            --accent2: #ff5e3a;
             --accent3: #3affcb;
-            --accent4: #a78bfa;
             --text: #ededf0;
-            --muted: #5a5a6e;
             --muted2: #8888a0;
         }
 
@@ -36,52 +30,47 @@
             background: var(--bg);
             color: var(--text);
             font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 400;
-            min-height: 100vh;
-            padding-bottom: 120px;
+            padding-bottom: 140px;
             overflow-x: hidden;
-            line-height: 1.2;
         }
 
-        /* Ottimizzazione per lo schermo del Pixel 10 XL Pro */
         .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
 
-        header { margin-bottom: 30px; padding-top: 10px; }
-        .logo-area { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
-        .logo-main { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 2px; color: var(--accent); line-height: 1; }
-        .version { font-family: 'DM+Mono', monospace; font-size: 12px; color: var(--muted2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; }
+        header { margin-bottom: 30px; }
+        .logo-main { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--accent); line-height: 1; }
 
-        .day-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .day-nav::-webkit-scrollbar { display: none; }
-        .day-pill { background: var(--surface); border: 1px solid var(--border); padding: 8px 20px; border-radius: 100px; white-space: nowrap; font-weight: 600; color: var(--muted2); transition: 0.3s; }
+        /* Navigazione giorni */
+        .day-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 20px; }
+        .day-pill { background: var(--surface); border: 1px solid var(--border); padding: 8px 20px; border-radius: 100px; font-weight: 600; color: var(--muted2); cursor: pointer; }
         .day-pill.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
-        .exc-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; transition: 0.3s; position: relative; overflow: hidden; }
-        .exc-card.active { border-color: var(--accent); box-shadow: 0 10px 30px rgba(232, 255, 71, 0.05); }
-        .exc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .exc-title { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .exc-tag { font-family: 'DM Mono', monospace; font-size: 11px; background: var(--surface); color: var(--accent3); padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
+        /* Card Esercizi */
+        .exc-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; cursor: pointer; }
+        .exc-card.active { border-color: var(--accent); }
+        .exc-header { display: flex; justify-content: space-between; align-items: center; }
+        .exc-title { font-size: 24px; font-weight: 700; text-transform: uppercase; }
+        .exc-info { font-family: 'DM Mono', monospace; font-size: 18px; color: var(--accent); margin-top: 10px; display: none; }
+        .exc-card.active .exc-info { display: block; }
 
-        .timer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 15, 17, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 15px 20px calc(15px + env(safe-area-inset-bottom)); z-index: 1000; display: flex; align-items: center; justify-content: space-between; }
-        .t-time { font-family: 'DM Mono', monospace; font-size: 32px; font-weight: 500; color: var(--accent); min-width: 100px; }
-        .t-controls { display: flex; gap: 8px; }
-        .btn { border: none; border-radius: 12px; font-weight: 700; font-family: 'Barlow Condensed'; font-size: 16px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn-p { background: var(--accent); color: var(--bg); padding: 10px 25px; }
-        .btn-s { background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 10px 15px; }
+        /* Timer Bar Fisso in basso */
+        .timer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 15, 17, 0.98); backdrop-filter: blur(15px); border-top: 1px solid var(--border); padding: 20px; z-index: 1000; display: flex; align-items: center; justify-content: space-between; }
+        .t-time { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 500; color: var(--accent); }
+        .t-controls { display: flex; gap: 10px; }
         
-        .blinking { animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .btn { border: none; border-radius: 12px; font-weight: 700; font-family: 'Barlow Condensed'; font-size: 16px; cursor: pointer; text-transform: uppercase; padding: 12px 18px; }
+        .btn-p { background: var(--accent); color: var(--bg); }
+        .btn-s { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+
+        .blinking { animation: blink 0.8s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="logo-area">
-            <h1 class="logo-main">15' PROTOCOL</h1>
-            <span class="version">v2.0 PRO</span>
-        </div>
-        <p style="color: var(--muted2); font-size: 14px;">Ottimizzato per Google Pixel 10 XL Pro</p>
+        <h1 class="logo-main">15' PROTOCOL</h1>
+        <p style="color: var(--muted2);">Pixel 10 XL Pro Optimized</p>
     </header>
 
     <div class="day-nav">
@@ -93,82 +82,51 @@
         <div class="day-pill">SAB</div>
     </div>
 
-    <div class="exc-card active">
+    <div class="exc-card active" onclick="this.classList.toggle('active')">
         <div class="exc-header">
-            <h2 class="exc-title">Push-up con elastico</h2>
-            <span class="exc-tag">Pettorali / Tricipiti</span>
+            <h2 class="exc-title">Push-up Elastico</h2>
+            <span style="font-size: 12px; color: var(--accent3);">PETTO</span>
         </div>
-        <div style="font-family: 'DM Mono', monospace; font-size: 18px; color: var(--accent);">3 Set x 12-15 Reps</div>
-        <p style="margin-top: 10px; color: var(--muted2); font-size: 14px;">Mantieni il core contratto e gomiti a 45 gradi.</p>
+        <div class="exc-info">3 Set x 12-15 Reps</div>
     </div>
 
-    <div class="exc-card">
+    <div class="exc-card" onclick="this.classList.toggle('active')">
         <div class="exc-header">
             <h2 class="exc-title">Shoulder Press</h2>
-            <span class="exc-tag">Spalle</span>
+            <span style="font-size: 12px; color: var(--accent3);">SPALLE</span>
         </div>
-        <div style="font-family: 'DM Mono', monospace; font-size: 18px; color: var(--accent3);">3 Set x 10 Reps</div>
+        <div class="exc-info">3 Set x 10 Reps</div>
     </div>
 </div>
 
 <div class="timer-bar">
     <div>
-        <div id="tLabel" style="font-size: 12px; color: var(--muted2); text-transform: uppercase; margin-bottom: 2px;">Rest Timer</div>
+        <div id="tLabel" style="font-size: 11px; color: var(--muted2); text-transform: uppercase;">Rest Timer</div>
         <div id="tDisplay" class="t-time">00:00</div>
     </div>
     <div class="t-controls">
         <button class="btn btn-s" onclick="setTimer(30)">30s</button>
         <button class="btn btn-s" onclick="setTimer(60)">60s</button>
-        <button id="tGo" class="btn btn-p" onclick="toggleTimer()">▶ Start</button>
+        <button id="tGo" class="btn btn-p" onclick="toggleTimer()">▶</button>
     </div>
 </div>
 
 <script>
     let timerSec = 0;
     let timerInterval = null;
-    let timerRunning = false;
+    let isRunning = false;
 
-    function fmt(s) {
+    function format(s) {
         const m = Math.floor(s / 60);
         const r = s % 60;
-        return `${m.toString().padStart(2,'0')}:${r.toString().padStart(2,'0')}`;
+        return `${m.toString().padStart(2, '0')}:${r.toString().padStart(2, '0')}`;
     }
 
     function setTimer(s) {
-        clearInterval(timerInterval);
-        timerRunning = false;
+        stopTimer();
         timerSec = s;
-        document.getElementById('tDisplay').textContent = fmt(timerSec);
-        document.getElementById('tGo').textContent = '▶ Start';
+        updateDisplay();
     }
 
-    function startTimer() {
-        if (timerSec <= 0) return;
-        timerRunning = true;
-        document.getElementById('tGo').textContent = '⏸ Stop';
-        timerInterval = setInterval(() => {
-            timerSec--;
-            document.getElementById('tDisplay').textContent = fmt(timerSec);
-            if (timerSec <= 0) {
-                clearInterval(timerInterval);
-                timerRunning = false;
-                document.getElementById('tDisplay').classList.add('blinking');
-                document.getElementById('tGo').textContent = '▶ Start';
-                alert("Recupero terminato!");
-            }
-        }, 1000);
-    }
-
-    function toggleTimer() {
-        if (timerRunning) {
-            clearInterval(timerInterval);
-            timerRunning = false;
-            document.getElementById('tGo').textContent = '▶ Start';
-        } else {
-            startTimer();
-        }
-    }
-</script>
-
-</body>
-</html>
+    function updateDisplay() {
+        const d = document.getElementById('t
