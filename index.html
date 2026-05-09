@@ -1,88 +1,1663 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>15' PROTOCOL</title>
-    <style>
-        :root { --bg: #080809; --accent: #e8ff47; --text: #ededf0; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; margin: 0; }
-        .card { background: #141417; padding: 20px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #252530; }
-        .timer-box { position: fixed; bottom: 0; left: 0; right: 0; background: #0f0f11; padding: 30px 20px; border-top: 1px solid #252530; text-align: center; }
-        #display { font-family: monospace; font-size: 50px; color: var(--accent); margin-bottom: 20px; }
-        .btn-group { display: flex; gap: 15px; justify-content: center; }
-        .btn { background: #252530; color: white; border: none; padding: 15px 25px; border-radius: 10px; font-size: 18px; font-weight: bold; min-width: 80px; }
-        #startBtn { background: var(--accent); color: black; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routine Mattutina 15' — v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080809;
+  --surface: #0f0f11;
+  --card: #141417;
+  --card2: #1a1a1f;
+  --border: #252530;
+  --border2: #32323f;
+  --accent: #e8ff47;
+  --accent2: #ff5e3a;
+  --accent3: #3affcb;
+  --accent4: #a78bfa;
+  --text: #ededf0;
+  --muted: #5a5a6e;
+  --muted2: #8888a0;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  padding: 2rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, #0d0d10 0%, transparent 100%);
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content:'';
+  position:absolute;
+  top:-60px; right:-60px;
+  width:260px; height:260px;
+  background: radial-gradient(circle, rgba(232,255,71,0.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+.logo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size: clamp(3rem,10vw,5.5rem);
+  line-height:.88;
+  letter-spacing:.03em;
+}
+.logo .y { color: var(--accent); }
+.logo .w { color: var(--text); }
+.tagline {
+  font-family:'DM Mono',monospace;
+  font-size:.65rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color: var(--muted);
+  margin-top:.6rem;
+}
+.header-pills {
+  display:flex; gap:.4rem; flex-wrap:wrap; margin-top:1rem;
+}
+.hpill {
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  padding:.25rem .65rem;
+  border:1px solid;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.hpill.a { border-color:var(--accent); color:var(--accent); }
+.hpill.b { border-color:var(--accent2); color:var(--accent2); }
+.hpill.c { border-color:var(--accent3); color:var(--accent3); }
+.hpill.d { border-color:var(--accent4); color:var(--accent4); }
+
+/* ── DAY NAV ── */
+.day-nav {
+  display:flex; gap:.4rem; padding:1rem 1.5rem;
+  overflow-x:auto; scrollbar-width:none;
+  border-bottom:1px solid var(--border);
+}
+.day-nav::-webkit-scrollbar{display:none;}
+.dnav {
+  flex-shrink:0;
+  font-family:'DM Mono',monospace;
+  font-size:.62rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:.5rem 1rem;
+  border:1px solid var(--border2);
+  background:var(--card);
+  color:var(--muted);
+  cursor:pointer;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.dnav:hover { border-color:var(--accent); color:var(--text); }
+.dnav.active { background:var(--accent); color:#000; border-color:var(--accent); font-weight:500; }
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { padding:.8rem 1.5rem .4rem; }
+.prog-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem; }
+.prog-label { font-family:'DM Mono',monospace; font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+.prog-pct { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; color:var(--accent); }
+.prog-bar { height:2px; background:var(--border); position:relative; }
+.prog-fill { height:100%; background:var(--accent); transition:width .4s cubic-bezier(.4,0,.2,1); width:0%; }
+
+/* ── WARMUP BANNER ── */
+.warmup {
+  margin:1rem 1.5rem;
+  padding:.9rem 1.1rem;
+  background:rgba(255,94,58,.06);
+  border-left:2px solid var(--accent2);
+  display:flex; gap:.8rem; align-items:flex-start;
+}
+.warmup-icon { font-size:1.2rem; flex-shrink:0; margin-top:.1rem; }
+.warmup-text { font-size:.82rem; line-height:1.5; color:#d0d0d8; }
+.warmup-text strong { color:var(--accent2); font-size:.62rem; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:.1em; display:block; margin-bottom:.3rem; }
+
+/* ── DAY TITLE ── */
+.day-title {
+  padding:1rem 1.5rem .5rem;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.6rem;
+  letter-spacing:.04em;
+  color:var(--muted2);
+  border-bottom:1px solid var(--border);
+}
+
+/* ── EXERCISE CARD ── */
+.ex-list { padding:.8rem 1.5rem 140px; display:flex; flex-direction:column; gap:.6rem; }
+
+.ex-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  overflow:hidden;
+  transition:border-color .2s;
+}
+.ex-card.active { border-color:var(--accent); }
+.ex-card.done { border-color:var(--accent3); opacity:.75; }
+
+.ex-header {
+  display:grid;
+  grid-template-columns:2.8rem 1fr auto;
+  align-items:center;
+  gap:.8rem;
+  padding:.9rem 1rem;
+  cursor:pointer;
+  user-select:none;
+}
+
+.ex-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.2rem;
+  color:var(--border2);
+  line-height:1;
+  transition:color .2s;
+}
+.ex-card.active .ex-num { color:var(--accent); }
+.ex-card.done .ex-num { color:var(--accent3); }
+
+.ex-info {}
+.ex-name {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.05rem;
+  font-weight:700;
+  letter-spacing:.02em;
+  line-height:1.2;
+}
+.ex-target {
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:var(--muted);
+  margin-top:.2rem;
+}
+.ex-type-tag {
+  display:inline-block;
+  font-family:'DM Mono',monospace;
+  font-size:.52rem;
+  padding:.12rem .45rem;
+  border:1px solid;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  margin-top:.35rem;
+}
+.tag-elastic { border-color:var(--accent2); color:var(--accent2); }
+.tag-cali { border-color:var(--accent4); color:var(--accent4); }
+.tag-hybrid { border-color:var(--accent3); color:var(--accent3); }
+.tag-mobility { border-color:var(--muted); color:var(--muted); }
+
+.ex-meta { text-align:right; }
+.ex-sets {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.5rem;
+  color:var(--accent);
+  line-height:1;
+}
+.ex-rest {
+  font-family:'DM Mono',monospace;
+  font-size:.55rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-top:.2rem;
+}
+
+/* ── EXPANDED PANEL ── */
+.ex-body {
+  display:none;
+  border-top:1px solid var(--border);
+}
+.ex-card.active .ex-body { display:block; }
+
+/* SVG illustration */
+.svg-wrap {
+  background:var(--surface);
+  padding:1rem;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+  min-height:160px;
+}
+.svg-wrap svg { max-width:100%; }
+
+/* Cues */
+.cues-panel { padding:.9rem 1rem; }
+.cues-title {
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--muted);
+  margin-bottom:.6rem;
+  display:flex; align-items:center; gap:.6rem;
+}
+.cues-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.cue {
+  display:flex; gap:.6rem; align-items:flex-start;
+  margin-bottom:.45rem;
+  font-size:.85rem;
+  line-height:1.45;
+  color:#c8c8d8;
+}
+.cue-arrow { color:var(--accent2); flex-shrink:0; margin-top:.05rem; font-size:.75rem; }
+
+.sci-box {
+  margin:.6rem 0 0;
+  padding:.65rem .85rem;
+  background:rgba(232,255,71,.03);
+  border-left:2px solid var(--accent);
+  font-family:'DM Mono',monospace;
+  font-size:.65rem;
+  color:var(--muted2);
+  line-height:1.55;
+}
+.sci-box::before { content:'📊 '; }
+
+/* Progression */
+.prog-steps {
+  margin:.6rem 0 0;
+  padding:.65rem .85rem;
+  background:rgba(167,139,250,.04);
+  border-left:2px solid var(--accent4);
+}
+.prog-steps-title {
+  font-family:'DM Mono',monospace;
+  font-size:.55rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--accent4);
+  margin-bottom:.4rem;
+}
+.prog-step {
+  font-size:.78rem;
+  color:#b8b8d0;
+  padding:.15rem 0;
+  display:flex; gap:.5rem;
+}
+.prog-step-num { color:var(--accent4); font-family:'DM Mono',monospace; font-size:.65rem; }
+
+.done-btn {
+  display:block; width:100%;
+  padding:.65rem;
+  background:transparent;
+  border:none;
+  border-top:1px solid var(--border);
+  color:var(--accent3);
+  font-family:'DM Mono',monospace;
+  font-size:.65rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .15s;
+}
+.done-btn:hover { background:var(--accent3); color:#000; }
+.done-btn.completed { background:rgba(58,255,203,.1); color:var(--accent3); }
+
+/* ── TIMER ── */
+.timer-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--surface);
+  border-top:1px solid var(--border2);
+  padding:.8rem 1.5rem;
+  display:flex; align-items:center; gap:.8rem;
+  z-index:200;
+  backdrop-filter:blur(10px);
+}
+.t-time {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.8rem;
+  line-height:1;
+  color:var(--accent);
+  min-width:5.5rem;
+  transition:color .3s;
+}
+.t-time.run { color:var(--accent2); }
+.t-time.end { color:var(--accent3); }
+.t-info { flex:1; }
+.t-label { font-family:'DM Mono',monospace; font-size:.58rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.t-btns { display:flex; gap:.35rem; flex-wrap:wrap; }
+.tb {
+  border:1px solid var(--border2);
+  background:var(--card2);
+  color:var(--muted2);
+  font-family:'DM Mono',monospace;
+  font-size:.6rem;
+  padding:.4rem .7rem;
+  cursor:pointer;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.tb:hover { border-color:var(--accent); color:var(--accent); }
+.tb.go { background:var(--accent); color:#000; border-color:var(--accent); font-weight:600; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.blinking { animation:blink .9s infinite; }
+
+/* ── MUSCLE MAP COLORS ── */
+.m-primary { fill: rgba(232,255,71,0.55); }
+.m-secondary { fill: rgba(255,94,58,0.35); }
+.m-inactive { fill: rgba(255,255,255,0.06); }
+.m-skeleton { stroke:#3a3a4a; stroke-width:1.2; fill:none; }
+.m-joint { fill:#3a3a4a; }
+.m-elastico { stroke:var(--accent2); stroke-width:2; stroke-dasharray:4,3; fill:none; }
+.m-arrow { fill:var(--accent3); }
+.m-force { stroke:var(--accent); stroke-width:1.5; fill:none; marker-end:url(#arr); }
+</style>
 </head>
 <body>
 
-    <h1 style="color:var(--accent); margin-bottom:30px;">15' MORNING</h1>
+<!-- HEADER -->
+<div class="header">
+  <div class="logo"><span class="y">15'</span><br><span class="w">MORNING<br>PROTOCOL</span></div>
+  <div class="tagline">Elastici · Calisthenics · Ipertrofia · Forza</div>
+  <div class="header-pills">
+    <div class="hpill a">MEV 4–6 serie/muscolo</div>
+    <div class="hpill b">Target 1–2 RIR</div>
+    <div class="hpill c">Alta frequenza 6×/sett</div>
+    <div class="hpill d">Progressione calisthenics</div>
+  </div>
+</div>
 
-    <div class="card">
-        <h2>PUSH-UP ELASTICO</h2>
-        <p>3 Set x 12-15 Reps</p>
-    </div>
+<!-- DAY NAV -->
+<div class="day-nav" id="dayNav"></div>
 
-    <div class="card">
-        <h2>SHOULDER PRESS</h2>
-        <p>3 Set x 10 Reps</p>
-    </div>
+<!-- PROGRESS -->
+<div class="prog-wrap">
+  <div class="prog-row">
+    <div class="prog-label">Completamento sessione</div>
+    <div class="prog-pct" id="progPct">0%</div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+</div>
 
-    <div class="timer-box">
-        <div id="display">00:00</div>
-        <div class="btn-group">
-            <button class="btn t-set" data-time="30">30s</button>
-            <button class="btn t-set" data-time="60">60s</button>
-            <button class="btn" id="startBtn">START</button>
-        </div>
-    </div>
+<!-- WARMUP -->
+<div class="warmup">
+  <div class="warmup-icon">⚡</div>
+  <div class="warmup-text">
+    <strong>Attivazione 90 sec — obbligatoria</strong>
+    10 arm circle avanti+dietro · 10 hip circle · 5 inchworm · 10 jumping jack. Il tirzepatide ottimizza la sensibilità insulinica post-esercizio: ogni sessione ha impatto metabolico reale.
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="day-title" id="dayTitle"></div>
+<div class="ex-list" id="exList"></div>
+
+<!-- TIMER -->
+<div class="timer-bar">
+  <div class="t-time" id="tDisplay">00:00</div>
+  <div class="t-info">
+    <div class="t-label" id="tLabel">Rest timer</div>
+  </div>
+  <div class="t-btns">
+    <button class="tb go" onclick="toggleTimer()" id="tGo">▶ Start</button>
+    <button class="tb" onclick="setRest(30)">30s</button>
+    <button class="tb" onclick="setRest(45)">45s</button>
+    <button class="tb" onclick="setRest(60)">60s</button>
+    <button class="tb" onclick="resetTimer()">↺</button>
+  </div>
+</div>
 
 <script>
-    let timer = null;
-    let timeLeft = 0;
+// ════════════════════════════════════════
+//  SVG ILLUSTRATIONS
+// ════════════════════════════════════════
+// Stick-figure SVGs with muscle highlight + elastico/arrows
+// Each returns an SVG string
 
-    // Sistema di ascolto diretto (più robusto per Pixel/Chrome)
-    document.addEventListener('click', function (e) {
-        // Se premo i tasti tempo
-        if (e.target.classList.contains('t-set')) {
-            clearInterval(timer);
-            timeLeft = parseInt(e.target.getAttribute('data-time'));
-            update();
-        }
+const svgs = {
 
-        // Se premo Start/Reset
-        if (e.target.id === 'startBtn') {
-            if (timer) {
-                clearInterval(timer);
-                timer = null;
-                timeLeft = 0;
-                update();
-                e.target.textContent = "START";
-            } else {
-                if (timeLeft <= 0) return;
-                e.target.textContent = "RESET";
-                timer = setInterval(() => {
-                    timeLeft--;
-                    update();
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        timer = null;
-                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                        alert("RECUPERO FINITO!");
-                        e.target.textContent = "START";
-                    }
-                }, 1000);
-            }
-        }
-    });
+pushup: `<svg viewBox="0 0 320 160" width="300" height="150" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="20" y1="130" x2="300" y2="130" stroke="#252530" stroke-width="1.5"/>
+  <!-- body plank --><rect x="60" y="90" width="150" height="12" rx="6" fill="rgba(232,255,71,0.55)"/>
+  <!-- head --><circle cx="230" cy="80" r="14" fill="none" stroke="#3a3a4a" stroke-width="1.5"/><circle cx="230" cy="80" r="4" fill="#3a3a4a"/>
+  <!-- arms --><line x1="80" y1="96" x2="80" y2="130" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="170" y1="96" x2="170" y2="130" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- hands --><circle cx="80" cy="130" r="5" fill="#3a3a4a"/><circle cx="170" cy="130" r="5" fill="#3a3a4a"/>
+  <!-- legs --><line x1="60" y1="96" x2="40" y2="130" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="65" y1="96" x2="50" y2="130" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- elastico -->
+  <path d="M80,96 Q125,70 170,96" stroke="#ff5e3a" stroke-width="2" stroke-dasharray="5,3" fill="none"/>
+  <text x="120" y="68" font-size="9" fill="#ff5e3a" font-family="monospace" text-anchor="middle">elastico</text>
+  <!-- muscle highlight chest -->
+  <ellipse cx="125" cy="96" rx="32" ry="8" fill="rgba(232,255,71,0.3)" stroke="rgba(232,255,71,0.6)" stroke-width="1"/>
+  <!-- movement arrows -->
+  <line x1="125" y1="88" x2="125" y2="72" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="136" y="78" font-size="8" fill="#3affcb" font-family="monospace">up</text>
+  <!-- labels -->
+  <text x="125" y="148" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">PUSH-UP CON ELASTICO</text>
+  <text x="125" y="100" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">PETTO</text>
+</svg>`,
 
-    function update() {
-        let m = Math.floor(timeLeft / 60);
-        let s = timeLeft % 60;
-        document.getElementById('display').textContent = 
-            (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
+shoulderpress: `<svg viewBox="0 0 320 180" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="60" y1="165" x2="260" y2="165" stroke="#252530" stroke-width="1.5"/>
+  <!-- elastico base --><rect x="130" y="155" width="40" height="10" rx="3" fill="#252530" stroke="#ff5e3a" stroke-width="1"/>
+  <!-- body --><rect x="145" y="90" width="14" height="55" rx="7" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="152" cy="75" r="14" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- shoulders highlighted -->
+  <ellipse cx="134" cy="96" rx="10" ry="8" fill="rgba(232,255,71,0.55)" stroke="rgba(232,255,71,0.7)" stroke-width="1"/>
+  <ellipse cx="170" cy="96" rx="10" ry="8" fill="rgba(232,255,71,0.55)" stroke="rgba(232,255,71,0.7)" stroke-width="1"/>
+  <!-- arms up -->
+  <line x1="134" y1="96" x2="115" y2="48" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="170" y1="96" x2="189" y2="48" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- forearms -->
+  <line x1="115" y1="48" x2="115" y2="25" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="189" y1="48" x2="189" y2="25" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- handles -->
+  <rect x="108" y="20" width="14" height="6" rx="3" fill="#3a3a4a"/>
+  <rect x="182" y="20" width="14" height="6" rx="3" fill="#3a3a4a"/>
+  <!-- elastico lines -->
+  <line x1="115" y1="24" x2="135" y2="155" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="189" y1="24" x2="169" y2="155" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <!-- legs -->
+  <line x1="145" y1="145" x2="135" y2="165" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="159" y1="145" x2="169" y2="165" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- arrows -->
+  <line x1="115" y1="30" x2="115" y2="15" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="189" y1="30" x2="189" y2="15" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a2)"/>
+  <text x="152" y="100" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">DELTA</text>
+  <text x="152" y="175" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">SHOULDER PRESS — ELASTICO</text>
+</svg>`,
+
+tricepspushdown: `<svg viewBox="0 0 320 180" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- anchor top --><rect x="145" y="8" width="30" height="10" rx="4" fill="#252530" stroke="#ff5e3a" stroke-width="1.2"/>
+  <!-- elastico from top -->
+  <line x1="155" y1="18" x2="148" y2="80" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="165" y1="18" x2="172" y2="80" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <!-- body --><rect x="143" y="90" width="14" height="55" rx="7" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="150" cy="76" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- upper arms (fixed) -->
+  <line x1="135" y1="96" x2="135" y2="118" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="165" y1="96" x2="165" y2="118" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- forearms extended down -->
+  <line x1="135" y1="118" x2="125" y2="148" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="165" y1="118" x2="175" y2="148" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- triceps highlight -->
+  <ellipse cx="135" cy="130" rx="8" ry="14" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1" transform="rotate(-15,135,130)"/>
+  <ellipse cx="165" cy="130" rx="8" ry="14" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1" transform="rotate(15,165,130)"/>
+  <!-- handles --><circle cx="125" cy="150" r="5" fill="#3a3a4a"/><circle cx="175" cy="150" r="5" fill="#3a3a4a"/>
+  <!-- arrows -->
+  <line x1="125" y1="148" x2="125" y2="162" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="175" y1="148" x2="175" y2="162" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a3)"/>
+  <text x="150" y="108" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">TRICIPITE</text>
+  <text x="150" y="175" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">TRICEPS PUSHDOWN — ELASTICO</text>
+</svg>`,
+
+row: `<svg viewBox="0 0 320 170" width="300" height="155" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a4" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- anchor left --><rect x="10" y="85" width="18" height="10" rx="3" fill="#252530" stroke="#ff5e3a" stroke-width="1.2"/>
+  <!-- elastico -->
+  <line x1="28" y1="90" x2="130" y2="90" stroke="#ff5e3a" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- body hinge --><rect x="140" y="80" width="12" height="50" rx="6" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1" transform="rotate(-30,140,80)"/>
+  <!-- head --><circle cx="185" cy="68" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- pulling arm -->
+  <line x1="145" y1="92" x2="100" y2="90" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="100" y1="90" x2="65" y2="90" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- support arm -->
+  <line x1="145" y1="92" x2="165" y2="115" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- back highlight -->
+  <ellipse cx="160" cy="90" rx="22" ry="10" fill="rgba(232,255,71,0.45)" stroke="rgba(232,255,71,0.6)" stroke-width="1" transform="rotate(-30,160,90)"/>
+  <!-- legs -->
+  <line x1="148" y1="120" x2="140" y2="155" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="152" y1="120" x2="162" y2="155" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- arrow -->
+  <line x1="100" y1="90" x2="140" y2="90" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a4)"/>
+  <text x="120" y="82" font-size="8" fill="#3affcb" font-family="monospace" text-anchor="middle">tira</text>
+  <text x="165" y="95" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">DORSALE</text>
+  <text x="160" y="168" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">ROW UNILATERALE — ELASTICO</text>
+</svg>`,
+
+facepull: `<svg viewBox="0 0 320 170" width="300" height="155" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a5" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- anchor right --><rect x="275" y="78" width="18" height="12" rx="3" fill="#252530" stroke="#ff5e3a" stroke-width="1.2"/>
+  <!-- elastico -->
+  <line x1="275" y1="84" x2="195" y2="84" stroke="#ff5e3a" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- body -->
+  <rect x="148" y="88" width="13" height="58" rx="6" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="154" cy="74" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- arms pulling out and back -->
+  <line x1="140" y1="96" x2="110" y2="84" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="168" y1="96" x2="195" y2="84" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- rear delt highlight -->
+  <ellipse cx="142" cy="96" rx="11" ry="8" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1"/>
+  <ellipse cx="166" cy="96" rx="11" ry="8" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1"/>
+  <!-- external rotation indicator -->
+  <path d="M110,84 Q108,70 120,68" stroke="#a78bfa" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+  <text x="108" y="65" font-size="7" fill="#a78bfa" font-family="monospace">ext rot</text>
+  <!-- legs -->
+  <line x1="148" y1="146" x2="138" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="161" y1="146" x2="171" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- arrows -->
+  <line x1="180" y1="84" x2="112" y2="84" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a5)"/>
+  <text x="154" y="100" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">DELTA POST</text>
+  <text x="154" y="168" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">FACE PULL — ELASTICO</text>
+</svg>`,
+
+curl: `<svg viewBox="0 0 320 170" width="300" height="155" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a6" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="60" y1="160" x2="260" y2="160" stroke="#252530" stroke-width="1.5"/>
+  <!-- elastico base -->
+  <ellipse cx="154" cy="158" rx="18" ry="5" fill="#252530" stroke="#ff5e3a" stroke-width="1.2"/>
+  <!-- body -->
+  <rect x="143" y="90" width="13" height="58" rx="6" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="149" cy="76" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- upper arms fixed -->
+  <line x1="135" y1="97" x2="132" y2="125" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="163" y1="97" x2="166" y2="125" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- forearms curled -->
+  <line x1="132" y1="125" x2="118" y2="105" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="166" y1="125" x2="180" y2="105" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- bicep highlight -->
+  <ellipse cx="133" cy="112" rx="9" ry="12" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1" transform="rotate(-20,133,112)"/>
+  <ellipse cx="165" cy="112" rx="9" ry="12" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1" transform="rotate(20,165,112)"/>
+  <!-- elastico lines -->
+  <line x1="118" y1="105" x2="140" y2="155" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="180" y1="105" x2="168" y2="155" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <!-- handles -->
+  <rect x="112" y="102" width="10" height="5" rx="2" fill="#3a3a4a"/>
+  <rect x="178" y="102" width="10" height="5" rx="2" fill="#3a3a4a"/>
+  <!-- legs -->
+  <line x1="143" y1="148" x2="133" y2="160" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="156" y1="148" x2="166" y2="160" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- arrow -->
+  <line x1="120" y1="110" x2="118" y2="96" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a6)"/>
+  <text x="149" y="108" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">BICIPITE</text>
+  <text x="149" y="172" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">CURL BICIPITE — ELASTICO</text>
+</svg>`,
+
+squat: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a7" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="60" y1="162" x2="260" y2="162" stroke="#252530" stroke-width="1.5"/>
+  <!-- body in squat position -->
+  <!-- torso slightly forward -->
+  <rect x="143" y="98" width="14" height="40" rx="7" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1" transform="rotate(-10,150,118)"/>
+  <!-- head --><circle cx="157" cy="84" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- thighs (parallel) -->
+  <line x1="145" y1="128" x2="120" y2="150" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <line x1="158" y1="130" x2="182" y2="150" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <!-- shins -->
+  <line x1="120" y1="150" x2="108" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="182" y1="150" x2="194" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- arms extended forward -->
+  <line x1="143" y1="108" x2="110" y2="108" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- quad highlight -->
+  <ellipse cx="130" cy="143" rx="10" ry="16" fill="rgba(232,255,71,0.45)" stroke="rgba(232,255,71,0.6)" stroke-width="1" transform="rotate(-50,130,143)"/>
+  <ellipse cx="171" cy="143" rx="10" ry="16" fill="rgba(232,255,71,0.45)" stroke="rgba(232,255,71,0.6)" stroke-width="1" transform="rotate(50,171,143)"/>
+  <!-- glute hint -->
+  <ellipse cx="150" cy="128" rx="14" ry="10" fill="rgba(255,94,58,0.25)" stroke="rgba(255,94,58,0.4)" stroke-width="1"/>
+  <!-- elastico above knees -->
+  <path d="M108,150 Q150,140 192,150" stroke="#ff5e3a" stroke-width="2" stroke-dasharray="5,3" fill="none"/>
+  <text x="150" y="138" font-size="7" fill="#ff5e3a" font-family="monospace" text-anchor="middle">elastico ginocchia</text>
+  <!-- arrows — knees out -->
+  <line x1="120" y1="148" x2="105" y2="145" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a7)"/>
+  <line x1="182" y1="148" x2="197" y2="145" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a7)"/>
+  <text x="150" y="134" font-size="6" fill="#3affcb" font-family="monospace" text-anchor="middle">push out!</text>
+  <text x="158" y="110" font-size="7" fill="#e8ff47" font-family="monospace">QUAD+GLUT</text>
+  <text x="150" y="173" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">SQUAT CON ELASTICO (over-band)</text>
+</svg>`,
+
+hipthrust: `<svg viewBox="0 0 320 170" width="300" height="155" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a8" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- bench/surface --><rect x="190" y="115" width="80" height="12" rx="4" fill="#1a1a2a" stroke="#252530" stroke-width="1.5"/>
+  <!-- floor --><line x1="40" y1="160" x2="280" y2="160" stroke="#252530" stroke-width="1.5"/>
+  <!-- upper back on bench -->
+  <rect x="195" y="105" width="40" height="14" rx="6" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head on bench -->
+  <circle cx="248" cy="108" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- torso elevated -->
+  <rect x="148" y="102" width="52" height="14" rx="7" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1" transform="rotate(-5,174,109)"/>
+  <!-- hips at top — glute highlight -->
+  <ellipse cx="158" cy="108" rx="22" ry="14" fill="rgba(232,255,71,0.55)" stroke="rgba(232,255,71,0.7)" stroke-width="1.5"/>
+  <text x="158" y="111" font-size="7" fill="#000" font-family="monospace" text-anchor="middle" font-weight="bold">GLUTEO</text>
+  <!-- thighs down -->
+  <line x1="148" y1="118" x2="120" y2="155" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <line x1="165" y1="118" x2="140" y2="155" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <!-- shins vertical -->
+  <line x1="120" y1="155" x2="118" y2="160" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="140" y1="155" x2="138" y2="160" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- elastico on hips -->
+  <path d="M130,100 Q158,88 185,100" stroke="#ff5e3a" stroke-width="2.5" stroke-dasharray="5,3" fill="none"/>
+  <text x="158" y="85" font-size="7" fill="#ff5e3a" font-family="monospace" text-anchor="middle">elastico</text>
+  <!-- arms to floor anchoring elastico -->
+  <line x1="200" y1="115" x2="185" y2="125" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <!-- arrow up -->
+  <line x1="158" y1="100" x2="158" y2="82" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a8)"/>
+  <text x="158" y="168" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">HIP THRUST — ELASTICO</text>
+</svg>`,
+
+rdl: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a9" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="60" y1="162" x2="260" y2="162" stroke="#252530" stroke-width="1.5"/>
+  <!-- elastico under feet -->
+  <ellipse cx="155" cy="160" rx="30" ry="6" fill="#252530" stroke="#ff5e3a" stroke-width="1.2"/>
+  <!-- body hinge fwd -->
+  <!-- torso nearly horizontal -->
+  <rect x="125" y="88" width="55" height="13" rx="6" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1" transform="rotate(35,152,94)"/>
+  <!-- head -->
+  <circle cx="185" cy="73" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- hamstring/glute highlight -->
+  <ellipse cx="150" cy="128" rx="14" ry="22" fill="rgba(232,255,71,0.45)" stroke="rgba(232,255,71,0.6)" stroke-width="1" transform="rotate(-5,150,128)"/>
+  <text x="135" y="132" font-size="6" fill="#e8ff47" font-family="monospace">FEMORALE</text>
+  <!-- legs straight -->
+  <line x1="145" y1="130" x2="138" y2="162" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <line x1="160" y1="130" x2="168" y2="162" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <!-- arms hanging -->
+  <line x1="133" y1="95" x2="128" y2="140" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="148" y1="98" x2="168" y2="138" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- handles / elastico -->
+  <rect x="122" y="138" width="10" height="5" rx="2" fill="#3a3a4a"/>
+  <rect x="164" y="136" width="10" height="5" rx="2" fill="#3a3a4a"/>
+  <line x1="127" y1="141" x2="138" y2="156" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="169" y1="139" x2="165" y2="157" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <!-- eccentrica arrow -->
+  <line x1="155" y1="88" x2="160" y2="70" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a9)"/>
+  <text x="168" y="66" font-size="7" fill="#3affcb" font-family="monospace">su 3s</text>
+  <text x="155" y="172" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">ROMANIAN DEADLIFT — ELASTICO</text>
+</svg>`,
+
+thruster: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a10" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="60" y1="162" x2="260" y2="162" stroke="#252530" stroke-width="1.5"/>
+  <!-- elastico under feet -->
+  <ellipse cx="154" cy="160" rx="28" ry="5" fill="#252530" stroke="#ff5e3a" stroke-width="1.2"/>
+  <!-- body standing, arms fully overhead -->
+  <rect x="144" y="90" width="14" height="55" rx="7" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="151" cy="76" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- arms extended overhead -->
+  <line x1="138" y1="98" x2="118" y2="55" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="162" y1="98" x2="184" y2="55" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="118" y1="55" x2="112" y2="30" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="184" y1="55" x2="190" y2="30" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- shoulder + full body highlight -->
+  <ellipse cx="140" cy="98" rx="10" ry="8" fill="rgba(232,255,71,0.4)" stroke="rgba(232,255,71,0.6)" stroke-width="1"/>
+  <ellipse cx="162" cy="98" rx="10" ry="8" fill="rgba(232,255,71,0.4)" stroke="rgba(232,255,71,0.6)" stroke-width="1"/>
+  <ellipse cx="151" cy="118" rx="14" ry="10" fill="rgba(255,94,58,0.2)" stroke="rgba(255,94,58,0.35)" stroke-width="1"/>
+  <!-- handles top -->
+  <rect x="106" y="26" width="12" height="6" rx="3" fill="#3a3a4a"/>
+  <rect x="184" y="26" width="12" height="6" rx="3" fill="#3a3a4a"/>
+  <!-- elastico lines -->
+  <line x1="112" y1="30" x2="138" y2="155" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="190" y1="30" x2="168" y2="155" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <!-- legs -->
+  <line x1="144" y1="145" x2="132" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="158" y1="145" x2="170" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- arrows -->
+  <line x1="112" y1="35" x2="112" y2="18" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a10)"/>
+  <line x1="190" y1="35" x2="190" y2="18" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a10)"/>
+  <text x="151" y="108" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">FULL BODY</text>
+  <text x="151" y="173" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">THRUSTER — ELASTICO</text>
+</svg>`,
+
+pallof: `<svg viewBox="0 0 320 170" width="300" height="155" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a11" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- anchor left --><rect x="12" y="90" width="18" height="12" rx="3" fill="#252530" stroke="#ff5e3a" stroke-width="1.2"/>
+  <!-- elastico horizontal -->
+  <line x1="30" y1="96" x2="120" y2="96" stroke="#ff5e3a" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- body side-on -->
+  <rect x="145" y="88" width="13" height="58" rx="6" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="151" cy="74" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- arms extended forward (press position) -->
+  <line x1="145" y1="100" x2="120" y2="96" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- core highlight -->
+  <ellipse cx="151" cy="112" rx="14" ry="18" fill="rgba(232,255,71,0.35)" stroke="rgba(232,255,71,0.5)" stroke-width="1"/>
+  <text x="151" y="116" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">CORE</text>
+  <!-- rotation resist arrows -->
+  <path d="M170,96 Q178,86 170,76" stroke="#a78bfa" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+  <text x="176" y="84" font-size="7" fill="#a78bfa" font-family="monospace">resist!</text>
+  <!-- legs -->
+  <line x1="145" y1="146" x2="133" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="158" y1="146" x2="170" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- floor --><line x1="60" y1="162" x2="260" y2="162" stroke="#252530" stroke-width="1.5"/>
+  <!-- press arrow -->
+  <line x1="130" y1="96" x2="110" y2="96" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a11)"/>
+  <text x="151" y="168" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">PALLOF PRESS — ANTI-ROTATION</text>
+</svg>`,
+
+burpee: `<svg viewBox="0 0 320 165" width="300" height="150" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a12" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="20" y1="152" x2="300" y2="152" stroke="#252530" stroke-width="1.5"/>
+  <!-- Phase 1: squat down -->
+  <text x="40" y="22" font-size="8" fill="#5a5a6e" font-family="monospace">①squat</text>
+  <circle cx="55" cy="35" r="8" fill="none" stroke="#3a3a4a" stroke-width="1.2"/>
+  <rect x="50" y="43" width="8" height="22" rx="4" fill="rgba(255,255,255,0.06)" stroke="#3a3a4a" stroke-width="1" transform="rotate(10,54,54)"/>
+  <line x1="50" y1="60" x2="40" y2="75" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="58" y1="60" x2="68" y2="75" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <!-- Phase 2: plank -->
+  <text x="100" y="22" font-size="8" fill="#5a5a6e" font-family="monospace">②plank</text>
+  <circle cx="168" cy="88" r="8" fill="none" stroke="#3a3a4a" stroke-width="1.2"/>
+  <rect x="115" y="93" width="60" height="8" rx="4" fill="rgba(232,255,71,0.2)" stroke="rgba(232,255,71,0.5)" stroke-width="1"/>
+  <line x1="120" y1="97" x2="118" y2="110" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="168" y1="97" x2="166" y2="110" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="115" y1="97" x2="100" y2="110" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <!-- Phase 3: jump -->
+  <text x="228" y="22" font-size="8" fill="#5a5a6e" font-family="monospace">③jump</text>
+  <circle cx="258" cy="40" r="8" fill="none" stroke="#3a3a4a" stroke-width="1.2"/>
+  <rect x="252" y="48" width="10" height="28" rx="5" fill="rgba(255,255,255,0.06)" stroke="#3a3a4a" stroke-width="1"/>
+  <line x1="248" y1="54" x2="238" y2="48" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="266" y1="54" x2="276" y2="48" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="252" y1="75" x2="245" y2="90" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="262" y1="75" x2="269" y2="90" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <!-- jump arrow -->
+  <line x1="258" y1="35" x2="258" y2="20" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a12)"/>
+  <!-- flow arrows -->
+  <line x1="78" y1="55" x2="98" y2="90" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#a12)"/>
+  <line x1="180" y1="97" x2="225" y2="55" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#a12)"/>
+  <text x="150" y="158" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">BURPEE — 3 FASI</text>
+</svg>`,
+
+pikepushup: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a13" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="40" y1="155" x2="280" y2="155" stroke="#252530" stroke-width="1.5"/>
+  <!-- inverted V shape body -->
+  <!-- hands on floor -->
+  <circle cx="90" cy="152" r="6" fill="#3a3a4a"/>
+  <circle cx="220" cy="152" r="6" fill="#3a3a4a"/>
+  <!-- arms -->
+  <line x1="90" y1="152" x2="120" y2="115" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="220" y1="152" x2="188" y2="115" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- torso V apex -->
+  <line x1="120" y1="115" x2="155" y2="75" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <line x1="188" y1="115" x2="155" y2="75" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <!-- hips at top -->
+  <circle cx="155" cy="72" r="10" fill="rgba(232,255,71,0.4)" stroke="rgba(232,255,71,0.6)" stroke-width="1.5"/>
+  <!-- legs -->
+  <line x1="155" y1="75" x2="148" y2="118" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="155" y1="75" x2="162" y2="118" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="148" y1="118" x2="143" y2="152" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="162" y1="118" x2="167" y2="152" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- head lowering -->
+  <circle cx="155" cy="105" r="11" fill="none" stroke="#3a3a4a" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <!-- delta highlight -->
+  <ellipse cx="122" cy="112" rx="10" ry="8" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1"/>
+  <ellipse cx="188" cy="112" rx="10" ry="8" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1"/>
+  <!-- arrow head down -->
+  <line x1="155" y1="100" x2="155" y2="120" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a13)"/>
+  <text x="168" y="117" font-size="7" fill="#3affcb" font-family="monospace">testa↓</text>
+  <text x="122" y="116" font-size="6" fill="#e8ff47" font-family="monospace">DELTA</text>
+  <text x="155" y="168" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">PIKE PUSH-UP — CALISTHENICS</text>
+</svg>`,
+
+invertedrow: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a14" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- table -->
+  <rect x="60" y="78" width="200" height="10" rx="3" fill="#1a1a2a" stroke="#252530" stroke-width="1.5"/>
+  <line x1="80" y1="88" x2="80" y2="110" stroke="#252530" stroke-width="3"/>
+  <line x1="240" y1="88" x2="240" y2="110" stroke="#252530" stroke-width="3"/>
+  <!-- floor --><line x1="40" y1="158" x2="280" y2="158" stroke="#252530" stroke-width="1.5"/>
+  <!-- body hanging under table -->
+  <rect x="130" y="92" width="60" height="12" rx="6" fill="rgba(232,255,71,0.35)" stroke="rgba(232,255,71,0.55)" stroke-width="1"/>
+  <!-- head --><circle cx="212" cy="98" r="12" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- arms reaching up to table -->
+  <line x1="135" y1="98" x2="100" y2="83" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="175" y1="98" x2="200" y2="83" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- hands grip under table -->
+  <rect x="90" y="80" width="12" height="6" rx="3" fill="#3a3a4a"/>
+  <rect x="196" y="80" width="12" height="6" rx="3" fill="#3a3a4a"/>
+  <!-- back highlight -->
+  <ellipse cx="155" cy="100" rx="28" ry="8" fill="rgba(232,255,71,0.3)" stroke="rgba(232,255,71,0.5)" stroke-width="1"/>
+  <!-- legs extended -->
+  <line x1="130" y1="104" x2="100" y2="158" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="140" y1="104" x2="115" y2="158" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- arrows pull up -->
+  <line x1="135" y1="98" x2="135" y2="86" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a14)"/>
+  <text x="155" y="105" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">DORSALE</text>
+  <text x="155" y="168" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">INVERTED ROW — CALISTHENICS</text>
+</svg>`,
+
+hollowbody: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a15" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="20" y1="125" x2="300" y2="125" stroke="#252530" stroke-width="1.5"/>
+  <!-- body in hollow hold — banana shape curved -->
+  <!-- spine curve -->
+  <path d="M60,120 Q155,80 260,120" stroke="rgba(255,255,255,0.06)" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <!-- core + body -->
+  <path d="M60,120 Q155,82 260,120" stroke="rgba(232,255,71,0.45)" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <!-- head -->
+  <circle cx="68" cy="110" r="12" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- arms overhead -->
+  <line x1="68" y1="110" x2="42" y2="102" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="42" y1="102" x2="22" y2="108" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <!-- legs elevated -->
+  <line x1="255" y1="118" x2="280" y2="108" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="250" y1="120" x2="278" y2="112" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- core highlight -->
+  <ellipse cx="155" cy="100" rx="35" ry="10" fill="rgba(232,255,71,0.4)" stroke="rgba(232,255,71,0.6)" stroke-width="1.2"/>
+  <text x="155" y="104" font-size="7" fill="#000" font-family="monospace" text-anchor="middle" font-weight="bold">CORE</text>
+  <!-- lower back pressed -->
+  <path d="M130,118 Q155,116 180,118" stroke="#a78bfa" stroke-width="1.5" fill="none"/>
+  <text x="155" y="130" font-size="7" fill="#a78bfa" font-family="monospace" text-anchor="middle">lombare a terra</text>
+  <text x="155" y="148" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">HOLLOW BODY HOLD — CALISTHENICS</text>
+  <text x="155" y="160" font-size="7" fill="#5a5a6e" font-family="monospace" text-anchor="middle">base fondamentale ginnastica</text>
+</svg>`,
+
+lsit: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a16" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- Two supports (chairs/parallettes) -->
+  <rect x="70" y="108" width="20" height="8" rx="3" fill="#1a1a2a" stroke="#252530" stroke-width="1.2"/>
+  <rect x="220" y="108" width="20" height="8" rx="3" fill="#1a1a2a" stroke="#252530" stroke-width="1.2"/>
+  <line x1="75" y1="116" x2="75" y2="145" stroke="#252530" stroke-width="3"/>
+  <line x1="85" y1="116" x2="85" y2="145" stroke="#252530" stroke-width="3"/>
+  <line x1="225" y1="116" x2="225" y2="145" stroke="#252530" stroke-width="3"/>
+  <line x1="235" y1="116" x2="235" y2="145" stroke="#252530" stroke-width="3"/>
+  <!-- floor --><line x1="40" y1="145" x2="280" y2="145" stroke="#252530" stroke-width="1.5"/>
+  <!-- body in L-sit -->
+  <!-- torso upright -->
+  <rect x="143" y="68" width="14" height="45" rx="7" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="150" cy="55" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- arms straight down to supports -->
+  <line x1="138" y1="78" x2="83" y2="108" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="162" y1="78" x2="228" y2="108" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- legs horizontal — L shape -->
+  <line x1="143" y1="105" x2="80" y2="105" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <!-- core + hip flexor highlight -->
+  <ellipse cx="143" cy="108" rx="18" ry="10" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1.2"/>
+  <text x="143" y="112" font-size="6" fill="#000" font-family="monospace" text-anchor="middle" font-weight="bold">HIP FLEX</text>
+  <!-- tricep + shoulder highlight -->
+  <ellipse cx="104" cy="94" rx="10" ry="7" fill="rgba(255,94,58,0.3)" stroke="rgba(255,94,58,0.5)" stroke-width="1" transform="rotate(-30,104,94)"/>
+  <!-- gravity arrow -->
+  <line x1="150" y1="100" x2="150" y2="118" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a16)"/>
+  <text x="162" y="115" font-size="7" fill="#3affcb" font-family="monospace">gravity</text>
+  <text x="150" y="158" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">L-SIT — CALISTHENICS ISOMETRICO</text>
+  <text x="150" y="168" font-size="7" fill="#5a5a6e" font-family="monospace" text-anchor="middle">progressione: tucked → one leg → full</text>
+</svg>`,
+
+deadhang: `<svg viewBox="0 0 320 185" width="300" height="165" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a17" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- bar -->
+  <rect x="80" y="20" width="160" height="8" rx="4" fill="#1a1a2a" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- body hanging -->
+  <!-- hands -->
+  <rect x="110" y="26" width="14" height="7" rx="3" fill="#3a3a4a"/>
+  <rect x="196" y="26" width="14" height="7" rx="3" fill="#3a3a4a"/>
+  <!-- arms -->
+  <line x1="117" y1="33" x2="130" y2="58" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="203" y1="33" x2="190" y2="58" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- shoulders -->
+  <ellipse cx="130" cy="60" rx="12" ry="8" fill="rgba(255,94,58,0.25)" stroke="rgba(255,94,58,0.45)" stroke-width="1"/>
+  <ellipse cx="190" cy="60" rx="12" ry="8" fill="rgba(255,94,58,0.25)" stroke="rgba(255,94,58,0.45)" stroke-width="1"/>
+  <!-- torso -->
+  <rect x="145" y="62" width="14" height="60" rx="7" fill="rgba(255,255,255,0.07)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="152" cy="48" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- spine decompression visualization -->
+  <path d="M152,68 Q148,90 152,122" stroke="rgba(232,255,71,0.6)" stroke-width="2.5" stroke-dasharray="3,3" fill="none"/>
+  <!-- vertebrae icons -->
+  <rect x="148" y="72" width="8" height="5" rx="1" fill="rgba(232,255,71,0.2)" stroke="rgba(232,255,71,0.4)" stroke-width=".8"/>
+  <rect x="148" y="82" width="8" height="5" rx="1" fill="rgba(232,255,71,0.2)" stroke="rgba(232,255,71,0.4)" stroke-width=".8"/>
+  <rect x="148" y="92" width="8" height="5" rx="1" fill="rgba(232,255,71,0.2)" stroke="rgba(232,255,71,0.4)" stroke-width=".8"/>
+  <rect x="148" y="102" width="8" height="5" rx="1" fill="rgba(232,255,71,0.2)" stroke="rgba(232,255,71,0.4)" stroke-width=".8"/>
+  <rect x="148" y="112" width="8" height="5" rx="1" fill="rgba(232,255,71,0.2)" stroke="rgba(232,255,71,0.4)" stroke-width=".8"/>
+  <!-- legs -->
+  <line x1="145" y1="122" x2="135" y2="160" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="159" y1="122" x2="169" y2="160" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- gravity arrows on spine -->
+  <line x1="165" y1="80" x2="165" y2="115" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a17)"/>
+  <text x="170" y="100" font-size="7" fill="#3affcb" font-family="monospace">decomprime</text>
+  <text x="152" y="175" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">DEAD HANG — DECOMPRESSIONE</text>
+  <text x="152" y="185" font-size="7" fill="#5a5a6e" font-family="monospace" text-anchor="middle">riduce pressione L4–L5 del 30%</text>
+</svg>`,
+
+externalrot: `<svg viewBox="0 0 320 170" width="300" height="155" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a18" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- body -->
+  <rect x="145" y="88" width="13" height="58" rx="6" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="151" cy="74" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- upper arm fixed to side -->
+  <line x1="138" y1="97" x2="132" y2="122" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- forearm rotating OUT — two positions -->
+  <!-- start (neutral) dashed -->
+  <line x1="132" y1="122" x2="132" y2="148" stroke="#3a3a4a" stroke-width="3" stroke-dasharray="4,3" stroke-linecap="round"/>
+  <!-- end (external rotation) -->
+  <line x1="132" y1="122" x2="100" y2="128" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- rotation arc -->
+  <path d="M132,148 Q118,148 100,128" stroke="#3affcb" stroke-width="1.5" fill="none" stroke-dasharray="4,2" marker-end="url(#a18)"/>
+  <!-- cuff muscle highlight -->
+  <ellipse cx="135" cy="108" rx="10" ry="12" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1" transform="rotate(-10,135,108)"/>
+  <text x="118" y="106" font-size="6" fill="#e8ff47" font-family="monospace">SOTTOSPIN.</text>
+  <!-- elastico -->
+  <line x1="100" y1="128" x2="60" y2="122" stroke="#ff5e3a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <rect x="42" y="118" width="18" height="8" rx="3" fill="#252530" stroke="#ff5e3a" stroke-width="1"/>
+  <!-- legend -->
+  <text x="135" y="152" font-size="7" fill="#3a3a4a" font-family="monospace">start</text>
+  <text x="88" y="142" font-size="7" fill="#3affcb" font-family="monospace">fine ROM</text>
+  <!-- floor --><line x1="60" y1="162" x2="260" y2="162" stroke="#252530" stroke-width="1.5"/>
+  <line x1="138" y1="146" x2="130" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="158" y1="146" x2="168" y2="162" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <text x="151" y="172" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">EXTERNAL ROTATION — CUFFIA</text>
+</svg>`,
+
+worldstretch: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a19" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="20" y1="152" x2="300" y2="152" stroke="#252530" stroke-width="1.5"/>
+  <!-- lunge position -->
+  <!-- front foot --><ellipse cx="110" cy="152" rx="14" ry="4" fill="#252530" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- back knee --><ellipse cx="220" cy="152" rx="10" ry="4" fill="#252530" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- front leg -->
+  <line x1="110" y1="152" x2="118" y2="112" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <!-- back leg -->
+  <line x1="220" y1="152" x2="185" y2="118" stroke="#5a5a6e" stroke-width="6" stroke-linecap="round"/>
+  <!-- torso upright with rotation -->
+  <rect x="155" y="72" width="14" height="48" rx="7" fill="rgba(255,255,255,0.08)" stroke="#3a3a4a" stroke-width="1" transform="rotate(-5,162,96)"/>
+  <!-- head --><circle cx="165" cy="60" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- arm reaching up (thoracic rotation) -->
+  <line x1="162" y1="82" x2="196" y2="55" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="196" y1="55" x2="208" y2="40" stroke="#5a5a6e" stroke-width="3" stroke-linecap="round"/>
+  <!-- rotation arc -->
+  <path d="M162,78 Q178,65 196,55" stroke="#3affcb" stroke-width="1.5" fill="none" stroke-dasharray="3,2" marker-end="url(#a19)"/>
+  <!-- front hand on floor -->
+  <circle cx="118" cy="112" r="5" fill="#3a3a4a"/>
+  <!-- hip flexor highlight (back leg) -->
+  <ellipse cx="200" cy="130" rx="12" ry="16" fill="rgba(232,255,71,0.35)" stroke="rgba(232,255,71,0.5)" stroke-width="1" transform="rotate(-20,200,130)"/>
+  <!-- thoracic highlight -->
+  <ellipse cx="165" cy="85" rx="10" ry="15" fill="rgba(167,139,250,0.25)" stroke="rgba(167,139,250,0.45)" stroke-width="1" transform="rotate(-5,165,85)"/>
+  <text x="178" y="88" font-size="6" fill="#a78bfa" font-family="monospace">tor.</text>
+  <text x="208" y="35" font-size="6" fill="#3affcb" font-family="monospace">rot ↑</text>
+  <text x="194" y="140" font-size="6" fill="#e8ff47" font-family="monospace">hip flex</text>
+  <text x="155" y="168" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">WORLD'S GREATEST STRETCH</text>
+</svg>`,
+
+boxbreathing: `<svg viewBox="0 0 320 175" width="300" height="160" xmlns="http://www.w3.org/2000/svg">
+  <!-- background box -->
+  <rect x="60" y="20" width="200" height="130" rx="8" fill="rgba(232,255,71,0.03)" stroke="rgba(232,255,71,0.15)" stroke-width="1"/>
+  <!-- box breathing square path -->
+  <rect x="90" y="45" width="140" height="80" rx="4" fill="none" stroke="rgba(232,255,71,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+  <!-- animated dot concept - 4 labels on corners -->
+  <!-- Corner labels -->
+  <text x="90" y="42" font-size="8" fill="#e8ff47" font-family="monospace">IN 4s</text>
+  <text x="218" y="42" font-size="8" fill="#a78bfa" font-family="monospace">HOLD</text>
+  <text x="218" y="135" font-size="8" fill="#3affcb" font-family="monospace">OUT 4s</text>
+  <text x="88" y="135" font-size="8" fill="#ff5e3a" font-family="monospace">HOLD</text>
+  <!-- arrows along the box -->
+  <!-- top: inhale left to right -->
+  <line x1="108" y1="48" x2="218" y2="48" stroke="#e8ff47" stroke-width="1.5"/>
+  <polygon points="218,44 226,48 218,52" fill="#e8ff47"/>
+  <!-- right: hold top to bottom -->
+  <line x1="228" y1="60" x2="228" y2="118" stroke="#a78bfa" stroke-width="1.5"/>
+  <polygon points="224,118 228,126 232,118" fill="#a78bfa"/>
+  <!-- bottom: exhale right to left -->
+  <line x1="218" y1="128" x2="102" y2="128" stroke="#3affcb" stroke-width="1.5"/>
+  <polygon points="102,124 94,128 102,132" fill="#3affcb"/>
+  <!-- left: hold bottom to top -->
+  <line x1="92" y1="118" x2="92" y2="60" stroke="#ff5e3a" stroke-width="1.5"/>
+  <polygon points="88,60 92,52 96,60" fill="#ff5e3a"/>
+  <!-- center text -->
+  <text x="160" y="83" font-size="10" fill="rgba(232,255,71,0.6)" font-family="monospace" text-anchor="middle" font-weight="bold">BOX</text>
+  <text x="160" y="96" font-size="10" fill="rgba(232,255,71,0.6)" font-family="monospace" text-anchor="middle" font-weight="bold">BREATHING</text>
+  <text x="160" y="110" font-size="7" fill="#5a5a6e" font-family="monospace" text-anchor="middle">4-4-4-4</text>
+  <!-- benefit note -->
+  <text x="160" y="162" font-size="8" fill="#5a5a6e" font-family="monospace" text-anchor="middle">↓ cortisolo mattutino  ↑ HRV</text>
+  <text x="160" y="173" font-size="7" fill="#3a3a4a" font-family="monospace" text-anchor="middle">Zaccaro 2018 — Navy SEAL Protocol</text>
+</svg>`,
+
+diamondpushup: `<svg viewBox="0 0 320 160" width="300" height="145" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a20" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><polygon points="0,0 6,3 0,6" fill="#3affcb"/></marker></defs>
+  <!-- floor --><line x1="20" y1="130" x2="300" y2="130" stroke="#252530" stroke-width="1.5"/>
+  <!-- body plank -->
+  <rect x="60" y="90" width="160" height="12" rx="6" fill="rgba(255,255,255,0.07)" stroke="#3a3a4a" stroke-width="1"/>
+  <!-- head --><circle cx="238" cy="80" r="13" fill="none" stroke="#3a3a4a" stroke-width="1.5"/>
+  <!-- legs -->
+  <line x1="60" y1="96" x2="40" y2="130" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <line x1="65" y1="96" x2="50" y2="130" stroke="#5a5a6e" stroke-width="4" stroke-linecap="round"/>
+  <!-- diamond hand position — hands together under chest -->
+  <line x1="130" y1="96" x2="135" y2="130" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="148" y1="96" x2="143" y2="130" stroke="#5a5a6e" stroke-width="5" stroke-linecap="round"/>
+  <!-- diamond shape hands -->
+  <polygon points="135,128 143,125 143,132 135,132" fill="#3a3a4a" stroke="#ff5e3a" stroke-width="1.2"/>
+  <text x="139" y="142" font-size="7" fill="#ff5e3a" font-family="monospace" text-anchor="middle">◆</text>
+  <!-- tricep highlight -->
+  <ellipse cx="135" cy="100" rx="14" ry="7" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1" transform="rotate(10,135,100)"/>
+  <ellipse cx="148" cy="100" rx="14" ry="7" fill="rgba(232,255,71,0.5)" stroke="rgba(232,255,71,0.7)" stroke-width="1" transform="rotate(-10,148,100)"/>
+  <!-- arrow -->
+  <line x1="139" y1="90" x2="139" y2="75" stroke="#3affcb" stroke-width="1.5" marker-end="url(#a20)"/>
+  <text x="139" y="73" font-size="6" fill="#3affcb" font-family="monospace" text-anchor="middle">up</text>
+  <text x="139" y="110" font-size="7" fill="#e8ff47" font-family="monospace" text-anchor="middle">TRICIPITE</text>
+  <text x="139" y="152" font-size="9" fill="#5a5a6e" font-family="monospace" text-anchor="middle">DIAMOND PUSH-UP — CALISTHENICS</text>
+</svg>`
+};
+
+// ════════════════════════════════════════
+//  WORKOUT DATA
+// ════════════════════════════════════════
+const days = [
+  {
+    label: "Push A",
+    title: "Push A — Petto · Spalle · Tricipiti",
+    exercises: [
+      {
+        name: "Push-Up con Elastico",
+        target: "Petto sternale + Tricipite",
+        type: "hybrid",
+        typeLabel: "Ibrido",
+        sets: "3", reps: "10–15", rest: 45,
+        svgKey: "pushup",
+        cues: [
+          "Elastico incrociato sul dorso, mani sui manici — crea resistenza ascendente",
+          "Mani larghezza spalle +2 dita, gomiti a 45° (non aperti al 90°)",
+          "Eccentrica 3 secondi in discesa, concentrica esplosiva in salita",
+          "Ultimo set: vai a 1 RIR (fermati quando senti che il prossimo potrebbe fallire)"
+        ],
+        science: "Schoenfeld 2021: la fase eccentrica lenta (≥3s) aumenta il TUT e il danno miofibrillare. La resistenza variabile dell'elastico massimizza il segnale nel picco di contrazione.",
+        progressions: ["Regolare → con pausa 2s in basso → con elastico più forte → archer push-up"]
+      },
+      {
+        name: "Shoulder Press con Elastico",
+        target: "Deltoide anteriore + mediale",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "10–12", rest: 45,
+        svgKey: "shoulderpress",
+        cues: [
+          "Elastico sotto i piedi, impugnature all'altezza delle orecchie",
+          "Press verticale pulito — non antevertire il busto",
+          "Stabilizza il core: evita iperestensione lombare durante la spinta",
+          "Pausa 1s in picco di contrazione (in alto)"
+        ],
+        science: "Lasevicius 2018 (J Str Cond Res): carichi moderati portati vicino al cedimento producono ipertrofia equivalente ai carichi elevati — perfetto con elastici.",
+        progressions: ["Bimanuale → unilaterale alternato → Z-press a terra (core extra)"]
+      },
+      {
+        name: "Diamond Push-Up",
+        target: "Tricipite + petto mediale",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "10–15", rest: 40,
+        svgKey: "diamondpushup",
+        cues: [
+          "Mani a diamante sotto lo sterno, gomiti scorono lungo il corpo",
+          "Eccentrica 3s, concentrica esplosiva",
+          "Aggiungi elastico sul dorso per aumentare la resistenza quando 15 rep diventano facili",
+          "Mantieni il corpo rigido come un'asse: non alzare i fianchi"
+        ],
+        science: "Calatayud 2015 (J Hum Kin): il diamond push-up produce attivazione EMG tricipitale superiore al pushdown al cavo. Massimo rendimento a corpo libero.",
+        progressions: ["Diamond → pike push-up per sovraccarico → dip su sedie → ring dip (futura palestra)"]
+      },
+      {
+        name: "Pike Push-Up",
+        target: "Deltoide — pattern overhead",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "8–12", rest: 45,
+        svgKey: "pikepushup",
+        cues: [
+          "Anche in alto, testa tra le braccia — angolo più verticale possibile",
+          "Abbassa la testa verso il pavimento tra le mani (non davanti)",
+          "Più verticale è il tuo corpo, più simula lo handstand push-up",
+          "Usa la parete: piedi a parete per maggiore verticalità"
+        ],
+        science: "Progressione verso handstand push-up: il pike push-up allena il pattern overhead senza attrezzi. La forza prodotta è proporzionale all'angolo del corpo con il pavimento.",
+        progressions: ["Pike → pike con piedi su sedia → wall HSPU negativo → wall HSPU completo"]
+      }
+    ]
+  },
+  {
+    label: "Pull B",
+    title: "Pull B — Schiena · Bicipiti · Cuffia",
+    exercises: [
+      {
+        name: "Row Unilaterale con Elastico",
+        target: "Gran dorsale + Romboide",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "10–12 per lato", rest: 45,
+        svgKey: "row",
+        cues: [
+          "Elastico ancorato basso (gamba tavolo / porta), tiro verso il fianco — non verso la spalla",
+          "Retrai la scapola PRIMA di tirare con il braccio: scapola → poi gomito",
+          "Eccentrica controllata 2–3 secondi in allungamento completo",
+          "Usa il tensore più resistente che ti consente forma corretta"
+        ],
+        science: "Rhea 2003: il volume unilaterale eguaglia o supera il bilaterale per ipertrofia locale. Riduce inoltre la dominanza del lato forte — rilevante per i chirurghi (lato dominante sovrasviluppato).",
+        progressions: ["Row elastico → inverted row → chest-to-bar inverted row → trazioni assistite"]
+      },
+      {
+        name: "Inverted Row (tavolo)",
+        target: "Dorsale + Bicipiti + Retrazione scapolare",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "10–15", rest: 45,
+        svgKey: "invertedrow",
+        cues: [
+          "Sotto un tavolo resistente, corpo rigido come asse — tira il petto verso il bordo",
+          "Più il corpo è orizzontale, più è difficile (piedi più lontani dal tavolo)",
+          "Pausa 1s in cima: petto tocca il bordo. Scapole completamente retratte",
+          "Alternativa: elastico ad ancoraggio alto per lat pulldown se non hai tavolo stabile"
+        ],
+        science: "Differenza chiave rispetto al row con elastico: l'inverted row allena la retrazione scapolare in posizione di carico assiale — pattern opposto alla flessione in sala operatoria.",
+        progressions: ["Corpo inclinato (facile) → orizzontale → piedi su sedia → petto a mano singola"]
+      },
+      {
+        name: "Face Pull con Elastico",
+        target: "Deltoide posteriore + Cuffia rotatori",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "15–20", rest: 30,
+        svgKey: "facepull",
+        cues: [
+          "Elastico ancorato all'altezza del viso, tiro verso le orecchie con gomiti alti",
+          "Apertura esterna massima in fine corsa — pausa 2s",
+          "Non tirare con il trapezio: gomiti che guidano, non i polsi",
+          "Fondamentale per la salute della spalla del chirurgo (postura operatoria cronica)"
+        ],
+        science: "Cotter 2020: la postura in flessione prolungata (sala operatoria) causa indebolimento del deltoide posteriore e overload da impingement. Il face pull 3×/sett è prevenzione evidence-based.",
+        progressions: ["Leggero sempre — qualità > quantità. Aumenta reps, non tensione"]
+      },
+      {
+        name: "Curl Bicipite con Elastico",
+        target: "Bicipite brachiale",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "12–15", rest: 30,
+        svgKey: "curl",
+        cues: [
+          "Elastico sotto i piedi, presa supina, gomiti fissi ai fianchi",
+          "Massima supinazione in fine corsa per attivare il capo lungo",
+          "Non oscillare il busto: recluta il core",
+          "Ultimo set a cedimento completo"
+        ],
+        science: "Pedrosa 2022 (EJAP): allenare il bicipite in allungamento produce maggiore ipertrofia del ventre muscolare. L'elastico ha resistenza bassa in basso e alta in alto — compensare con eccentrica più lenta.",
+        progressions: ["Bimanuale → unilaterale → curl a concentrazione → curl con elastico in allungamento (ancoraggio alto)"]
+      },
+      {
+        name: "External Rotation con Elastico",
+        target: "Sottospinato + Piccolo rotondo",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "20 per lato", rest: 20,
+        svgKey: "externalrot",
+        cues: [
+          "Gomito fisso al fianco, avambraccio a 90°, rotazione esterna contro elastico leggero",
+          "Movimento lento e controllato — NON esplosivo, non è forza ma controllo",
+          "Asimmetria nei chirurghi: il braccio dominante è spesso in intrarotazione cronica",
+          "20 rep ogni mattina — prevenzione rotator cuff a lungo termine"
+        ],
+        science: "Ellenbecker 2010: la debolezza del sottospinato è il fattore #1 di impingement subacromiale nei chirurghi. Profilassi con elastico leggero ad alta ripetizione è lo standard evidence-based.",
+        progressions: ["Mantieni leggero sempre — questo è mantenimento, non ipertrofia"]
+      }
+    ]
+  },
+  {
+    label: "Legs C",
+    title: "Legs C — Quadricipiti · Glutei · Femorali",
+    exercises: [
+      {
+        name: "Squat con Elastico (over-band)",
+        target: "Quadricipiti + Gluteo medio",
+        type: "hybrid",
+        typeLabel: "Ibrido",
+        sets: "3", reps: "15–20", rest: 45,
+        svgKey: "squat",
+        cues: [
+          "Elastico sopra le ginocchia — crea abduzione forzata che devi vincere attivamente",
+          "Spingi le ginocchia verso l'esterno durante tutta la risalita",
+          "Profondità: almeno parallelo. Pausa 2s in basso per eliminare il rimbalzo tendineo",
+          "Busto leggermente inclinato in avanti è normale: mantieni lordosi neutra"
+        ],
+        science: "Contreras 2016: la resistenza laterale dell'elastico aumenta l'attivazione EMG del gluteo medio del 40% rispetto allo squat libero.",
+        progressions: ["Squat → squat pause 3s → squat con elastico forte → single-leg box squat"]
+      },
+      {
+        name: "Hip Thrust con Elastico",
+        target: "Gluteo massimo",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "15–20", rest: 45,
+        svgKey: "hipthrust",
+        cues: [
+          "Schiena sulla panca/divano, elastico sulle anche ancorato sotto i piedi",
+          "Ponte completo: estensione d'anca massima, pausa 2s in alto",
+          "Piedi piatti, ginocchia a 90° nel punto più alto",
+          "Non iperestendere la lombare: neutralizza il bacino in cima"
+        ],
+        science: "Neto 2020 (J Strength Cond): il hip thrust produce la maggiore attivazione EMG del gluteo massimo tra tutti gli esercizi. Con elastico, il picco di contrazione è potenziato.",
+        progressions: ["Bipodalico → con pausa 3s → unilaterale (B-stance) → single leg"]
+      },
+      {
+        name: "Romanian Deadlift con Elastico",
+        target: "Femorali + Gluteo",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "10–12", rest: 45,
+        svgKey: "rdl",
+        cues: [
+          "Elastico sotto i piedi, maniglie in presa prona — cerniera d'anca pura",
+          "Schiena neutra rigida, spinge i piedi nel pavimento mentre si scende",
+          "Fermati quando senti l'allungamento femorale (non guardare le mani)",
+          "Eccentrica 3 secondi: massimo stimolo in allungamento"
+        ],
+        science: "McMahon 2014: i femorali rispondono meglio all'allenamento in allungamento (full ROM eccentrico). Priorità all'eccentrica lenta per massimizzare l'ipertrofia.",
+        progressions: ["Bipodalico → stiff-leg → single-leg RDL (propriocezione elevata)"]
+      },
+      {
+        name: "Hollow Body Hold",
+        target: "Core — anti-estensione lombare",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "20–30 sec", rest: 30,
+        svgKey: "hollowbody",
+        cues: [
+          "Schiena completamente a terra — lombare che preme il pavimento, NON si solleva",
+          "Gambe e braccia sollevate simultaneamente: forma a banana",
+          "Tensiona tutto: glutei, addome, quadricipiti, spalle",
+          "Base fondamentale della ginnastica — trasferisce forza a tutti gli altri movimenti"
+        ],
+        science: "Tavares 2019: il hollow body hold attiva il retto addominale e il trasverso simultaneamente in co-contrazione — superiore a crunch e sit-up per stabilità lombare funzionale.",
+        progressions: ["Tucked hollow → gambe a 45° → gambe dritte → gambe + braccia → aggiunta peso"]
+      }
+    ]
+  },
+  {
+    label: "Full D",
+    title: "Full D — Full Body Metabolico",
+    exercises: [
+      {
+        name: "Thruster con Elastico",
+        target: "Full body — Quadricipiti → Spalle",
+        type: "hybrid",
+        typeLabel: "Ibrido",
+        sets: "4", reps: "10", rest: 30,
+        svgKey: "thruster",
+        cues: [
+          "Elastico sotto i piedi, mani alle orecchie — squat + press in movimento continuo",
+          "Spinta esplosiva dal basso, coordina il press nel punto di massima estensione",
+          "Usa la tua expertise CrossFit: pattern che conosci già",
+          "30s rest — alta densità metabolica. HRmax target: 80–85%"
+        ],
+        science: "Ratamess 2009: i compound multi-articolari ad alta intensità aumentano GH e testosterone endogeno fino a 30 min post-workout. Con tirzepatide (sensibilità insulinica aumentata), l'uptake muscolare è ottimizzato.",
+        progressions: ["Carica l'elastico progressivamente ogni 2 settimane"]
+      },
+      {
+        name: "Burpee (bodyweight)",
+        target: "Condizionamento + Full body",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "10", rest: 45,
+        svgKey: "burpee",
+        cues: [
+          "Esecuzione pulita: squat-thrust-push-up-salto verticale",
+          "Non sacrificare la forma per la velocità",
+          "Scala a step-out burpee se la frequenza cardiaca è già elevata",
+          "Usa come finisher metabolico — sempre ultimo"
+        ],
+        science: "Vollaard 2012 (IJSM): anche solo 2 set di esercizio ad alta intensità producono adattamenti cardiovascolari significativi. 15 min ad alta densità = 30–40 min steady-state.",
+        progressions: ["Standard → burpee con pull-up (se hai sbarra) → muscle-up burpee (avanzato)"]
+      },
+      {
+        name: "Pallof Press con Elastico",
+        target: "Core anti-rotatorio",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "10 per lato", rest: 30,
+        svgKey: "pallof",
+        cues: [
+          "Elastico ancorato lateralmente all'altezza del petto — resisti attivamente alla rotazione",
+          "Press verso l'esterno con braccia: tieni il core immobile",
+          "Non è un esercizio di movimento ma di resistenza isometrica: lento e controllato",
+          "Respira fuori durante il press — non trattenere"
+        ],
+        science: "McGill 2015: il core training anti-rotatorio protegge il disco L4-L5 meglio degli esercizi in flessione (crunch). Fondamentale per la longevità professionale del chirurgo.",
+        progressions: ["Pallof isometrico → pallof con rotazione → pallof con passo laterale"]
+      },
+      {
+        name: "L-Sit (su sedie/parallette)",
+        target: "Hip flexor + Core + Tricipite",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "10–20 sec", rest: 40,
+        svgKey: "lsit",
+        cues: [
+          "Due sedie stabili — braccia dritte, sollevati e tieni le gambe orizzontali",
+          "Progressione tucked: ginocchia al petto (più facile) → una gamba tesa → full L-sit",
+          "Spalle depresse (non alzarle verso le orecchie)",
+          "Il dolore agli hip flexor è normale all'inizio: si adatteranno rapidamente"
+        ],
+        science: "Il L-sit è uno degli esercizi isometrici più completi della ginnastica artistica. Attiva simultaneamente il retto addominale, gli hip flexor, il tricipite e i muscoli scapolari.",
+        progressions: ["Tucked (5s) → one leg (8s) → full L-sit (10s) → L-sit su parallette basse"]
+      }
+    ]
+  },
+  {
+    label: "Push A2",
+    title: "Push A2 — Variante Spinta Verticale",
+    exercises: [
+      {
+        name: "Shoulder Press con Elastico",
+        target: "Deltoide anteriore + mediale",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "4", reps: "8–10", rest: 50,
+        svgKey: "shoulderpress",
+        cues: [
+          "Oggi più pesante (elastico più forte) e meno reps: stimolo di forza",
+          "Stessa tecnica di Push A — ma vai a 1 RIR con carico maggiore",
+          "Alterna: giorno A = volume (3×12), giorno A2 = intensità (4×8)",
+          "Questo è il principio DUP (Daily Undulating Periodization)"
+        ],
+        science: "Colquhoun 2018: il DUP (variare intensità e volume tra sessioni) produce maggiori guadagni di forza e ipertrofia rispetto al volume lineare — ideale per alta frequenza.",
+        progressions: ["Aumenta tensione elastico ogni 3 settimane se raggiungi 10 rep con 2 RIR"]
+      },
+      {
+        name: "Pike Push-Up (avanzato)",
+        target: "Deltoide — pattern overhead",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "4", reps: "6–10", rest: 50,
+        svgKey: "pikepushup",
+        cues: [
+          "Oggi piedi su sedia: angolo più verticale = più difficile",
+          "Testa abbassa verso il pavimento tra le mani: tocca quasi il pavimento",
+          "Corpo più verticale possibile: stai simulando un handstand push-up negativo",
+          "Eccentrica 4s, concentrica esplosiva"
+        ],
+        science: "Progressione sistematica verso il wall handstand push-up. Ogni 5° di aumento dell'angolo aumenta il carico relativo sulle spalle del 8–12%.",
+        progressions: ["Piedi su sedia → piedi su tavolo → piedi a parete → wall HSPU"]
+      },
+      {
+        name: "External Rotation con Elastico",
+        target: "Cuffia rotatori — profilassi",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "20 per lato", rest: 20,
+        svgKey: "externalrot",
+        cues: [
+          "Eseguito DOPO la sessione push: la cuffia è affaticata, il lavoro è più utile",
+          "Leggero sempre — qualità del ROM, non forza",
+          "Rallenta ulteriormente: 2s concentrica, 3s eccentrica",
+          "Questo esercizio è la tua assicurazione sulla carriera chirurgica"
+        ],
+        science: "Integrazione post-push: il sottospinato è in allungamento relativo dopo la spinta — il rafforzamento in questa condizione è più specifico per la prevenzione.",
+        progressions: ["Mantieni leggero — profilassi, non ipertrofia"]
+      }
+    ]
+  },
+  {
+    label: "Pull B2",
+    title: "Pull B2 — Variante Trazione Orizzontale",
+    exercises: [
+      {
+        name: "Inverted Row — intensificato",
+        target: "Dorsale + Bicipiti",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "4", reps: "8–12", rest: 45,
+        svgKey: "invertedrow",
+        cues: [
+          "Oggi corpo più orizzontale di Pull B — aumenta la difficoltà",
+          "Aggiungi pausa 2s in cima: petto tocca il bordo del tavolo",
+          "Prova con una mano sul petto (archer row) per sovraccarico unilaterale",
+          "Progressione finale: trazioni complete"
+        ],
+        science: "L'inverted row progressivo prepara sistematicamente i muscoli per le trazioni (pull-up). Quando riesci a fare 3×15 orizzontale, sei pronto per le trazioni assistite.",
+        progressions: ["Inclinato → orizzontale → archer → trazioni negative → trazioni complete"]
+      },
+      {
+        name: "Face Pull con Elastico",
+        target: "Deltoide posteriore + Cuffia",
+        type: "elastic",
+        typeLabel: "Elastico",
+        sets: "3", reps: "20", rest: 25,
+        svgKey: "facepull",
+        cues: [
+          "Frequenza aumentata: eseguito in Pull B e Pull B2 ogni settimana",
+          "Totale settimanale: 6 set — MEV per salute scapolare",
+          "Focalizzati sull'apertura esterna massima: pausa 2s, poi rilascia lentamente",
+          "Immagina di aprire un libro con i gomiti"
+        ],
+        science: "2 sessioni/sett di face pull sono lo standard nei protocolli di salute della spalla per overhead athletes. I chirurghi rientrano in questa categoria per pattern posturale.",
+        progressions: ["Qualità sempre priorità su quantità — non aumentare tensione oltre il medio"]
+      },
+      {
+        name: "Dead Hang",
+        target: "Decompressione vertebrale + Grip",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "25–35 sec", rest: 45,
+        svgKey: "deadhang",
+        cues: [
+          "Sbarra o stipite della porta rinforzato — appesa passiva con spalle leggermente attive",
+          "Non completamente passivo: leggera depressione scapolare (spalle giù, non verso orecchie)",
+          "Lascia che la gravità decomprimia la colonna — respira profondo",
+          "Alternativa senza sbarra: stretching latissimus al muro con braccio overhead"
+        ],
+        science: "McGill & Karpowicz 2009: il dead hang riduce la pressione intradiscale L4-L5 del 30% rispetto alla posizione eretta. 3×30 sec mattutini = sessione di trazione fisioterapica.",
+        progressions: ["Passive hang → scapular pulls → dead hang con ginocchia alzate → trazione negativa"]
+      }
+    ]
+  },
+  {
+    label: "Rest",
+    title: "Active Rest — Mobilità · Respiro · Recupero",
+    exercises: [
+      {
+        name: "World's Greatest Stretch",
+        target: "Hip flexor + Toracica + Spalla",
+        type: "mobility",
+        typeLabel: "Mobilità",
+        sets: "3", reps: "5 per lato", rest: 0,
+        svgKey: "worldstretch",
+        cues: [
+          "Affondo lungo, mano interna al pavimento, rotazione toracica massima verso il soffitto",
+          "Mantieni 3–5 secondi in ogni posizione di massimo ROM",
+          "Antidoto alla postura chirurgica: flessione → apertura",
+          "Respira profondo in ogni posizione — l'espirazione permette maggiore ROM"
+        ],
+        science: "Un esercizio, 7 pattern di mobilità simultanei (hip flexor, femorale, thoracic rotation, shoulder, ankle, gluteo). Rapporto beneficio/tempo imbattibile.",
+        progressions: ["5 per lato → aggiungi rotazione del braccio overhead → aggiunta twist con braccio dietro"]
+      },
+      {
+        name: "Box Breathing (4-4-4-4)",
+        target: "Sistema nervoso autonomo — riduzione cortisolo",
+        type: "mobility",
+        typeLabel: "Respiro",
+        sets: "1", reps: "5 minuti", rest: 0,
+        svgKey: "boxbreathing",
+        cues: [
+          "Inspira 4 sec → Trattieni 4 sec → Espira 4 sec → Trattieni 4 sec",
+          "Mano sul petto ferma, mano sull'addome si muove: respiro diaframmatico",
+          "Tecnica Navy SEAL: riduce cortisolo mattutino del 20–30%",
+          "Il cortisolo alto mattutino è catabolico — ancora più importante con tirzepatide"
+        ],
+        science: "Zaccaro 2018 (Front Hum Neurosci): slow-paced breathing (4–6 respiri/min) riduce significativamente cortisolo salivare e migliora HRV. Integrato in protocolli atleti d'élite e forze speciali.",
+        progressions: ["4-4-4-4 → 4-7-8 (più parasimpatico) → coerenza cardiaca 5s-5s"]
+      },
+      {
+        name: "Dead Hang + Hollow Body",
+        target: "Decompressione + Core passivo",
+        type: "cali",
+        typeLabel: "Calisthenics",
+        sets: "3", reps: "30 sec ciascuno", rest: 30,
+        svgKey: "deadhang",
+        cues: [
+          "Alternare: 30s dead hang → 30s hollow body hold → riposo 30s",
+          "Nel dead hang: decompressione vertebrale attiva post-settimana lavorativa",
+          "Nel hollow body: attivazione dolce del core senza carico spinale",
+          "Questo giorno è recupero attivo — non sudorazione, non affaticamento"
+        ],
+        science: "Il recupero attivo (mobilità + isometria leggera) riduce il DOMS del 25–30% rispetto al riposo completo e accelera la sintesi proteica post-settimana (Dupuy 2018).",
+        progressions: ["Mantieni leggero — è il giorno per prepararsi alla settimana successiva"]
+      }
+    ]
+  }
+];
+
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+let currentDay = 0;
+let activeCard = null;
+let completed = new Set();
+let timerSec = 0;
+let timerRunning = false;
+let timerInterval = null;
+
+// ════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════
+function buildNav() {
+  const nav = document.getElementById('dayNav');
+  days.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'dnav' + (i === 0 ? ' active' : '');
+    btn.textContent = d.label;
+    btn.onclick = () => switchDay(i);
+    nav.appendChild(btn);
+  });
+}
+
+function switchDay(i) {
+  currentDay = i;
+  activeCard = null;
+  completed.clear();
+  document.querySelectorAll('.dnav').forEach((b, j) => b.classList.toggle('active', j === i));
+  renderDay();
+  updateProgress();
+  resetTimer();
+}
+
+function renderDay() {
+  const day = days[currentDay];
+  document.getElementById('dayTitle').textContent = day.title;
+  const list = document.getElementById('exList');
+  list.innerHTML = '';
+
+  day.exercises.forEach((ex, i) => {
+    const typeClass = { elastic:'tag-elastic', cali:'tag-cali', hybrid:'tag-hybrid', mobility:'tag-mobility' }[ex.type];
+    const restLabel = ex.rest > 0 ? `Rest ${ex.rest}s` : 'No rest';
+
+    const card = document.createElement('div');
+    card.className = 'ex-card';
+    card.id = `ec-${i}`;
+
+    card.innerHTML = `
+      <div class="ex-header" onclick="toggleCard(${i})">
+        <div class="ex-num" id="en-${i}">${String(i+1).padStart(2,'0')}</div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-target">${ex.target}</div>
+          <span class="ex-type-tag ${typeClass}">${ex.typeLabel}</span>
+        </div>
+        <div class="ex-meta">
+          <div class="ex-sets">${ex.sets}×${ex.reps}</div>
+          <div class="ex-rest">${restLabel}</div>
+        </div>
+      </div>
+      <div class="ex-body">
+        <div class="svg-wrap">${svgs[ex.svgKey] || ''}</div>
+        <div class="cues-panel">
+          <div class="cues-title">Cues tecnici</div>
+          ${ex.cues.map(c => `<div class="cue"><span class="cue-arrow">→</span>${c}</div>`).join('')}
+          <div class="sci-box">${ex.science}</div>
+          ${ex.progressions ? `<div class="prog-steps"><div class="prog-steps-title">Progressioni Calisthenics</div>${ex.progressions.map((p,pi)=>`<div class="prog-step"><span class="prog-step-num">P${pi+1}</span>${p}</div>`).join('')}</div>` : ''}
+          <button class="done-btn" id="db-${i}" onclick="markDone(${i}, event)">✓ Set completato — avvia rest</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function toggleCard(i) {
+  const card = document.getElementById(`ec-${i}`);
+  if (activeCard === i) {
+    card.classList.remove('active');
+    activeCard = null;
+  } else {
+    if (activeCard !== null) document.getElementById(`ec-${activeCard}`)?.classList.remove('active');
+    card.classList.add('active');
+    activeCard = i;
+  }
+}
+
+function markDone(i, e) {
+  e.stopPropagation();
+  const ex = days[currentDay].exercises[i];
+  completed.add(i);
+  document.getElementById(`ec-${i}`).classList.add('done');
+  const btn = document.getElementById(`db-${i}`);
+  btn.classList.add('completed');
+  btn.textContent = '✓ Completato';
+  updateProgress();
+  if (ex.rest > 0) { setRest(ex.rest); startTimer(); }
+}
+
+function updateProgress() {
+  const total = days[currentDay].exercises.length;
+  const done = completed.size;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = pct + '%';
+}
+
+// ════════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════════
+function fmt(s) {
+  return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+function setRest(s) {
+  if (timerRunning) { clearInterval(timerInterval); timerRunning = false; }
+  timerSec = s;
+  document.getElementById('tDisplay').textContent = fmt(s);
+  document.getElementById('tDisplay').className = 't-time';
+  document.getElementById('tLabel').textContent = `Rest: ${s}s`;
+  document.getElementById('tGo').textContent = '▶ Start';
+}
+function startTimer() {
+  if (timerSec <= 0) return;
+  timerRunning = true;
+  document.getElementById('tGo').textContent = '⏸ Stop';
+  document.getElementById('tDisplay').className = 't-time run';
+  timerInterval = setInterval(() => {
+    timerSec--;
+    document.getElementById('tDisplay').textContent = fmt(timerSec);
+    if (timerSec <= 0) {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      document.getElementById('tDisplay').className = 't-time end blinking';
+      document.getElementById('tLabel').textContent = '✓ Vai col prossimo set!';
+      document.getElementById('tGo').textContent = '▶ Start';
+      setTimeout(() => {
+        const el = document.getElementById('tDisplay');
+        if (el) { el.classList.remove('blinking'); el.className = 't-time'; }
+        document.getElementById('tLabel').textContent = 'Rest timer';
+      }, 4000);
     }
+  }, 1000);
+}
+function toggleTimer() {
+  if (timerRunning) { clearInterval(timerInterval); timerRunning = false; document.getElementById('tGo').textContent = '▶ Start'; document.getElementById('tDisplay').className = 't-time'; }
+  else startTimer();
+}
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSec = 0;
+  document.getElementById('tDisplay').textContent = '00:00';
+  document.getElementById('tDisplay').className = 't-time';
+  document.getElementById('tLabel').textContent = 'Rest timer';
+  document.getElementById('tGo').textContent = '▶ Start';
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+buildNav();
+renderDay();
 </script>
 </body>
 </html>
